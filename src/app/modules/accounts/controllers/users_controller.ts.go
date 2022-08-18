@@ -6,11 +6,11 @@ import (
 )
 
 func List(c *fiber.Ctx) error {
-	return c.SendString("Hello, World 👋!")
+	return c.SendString("List users!")
 }
 
 func Get(c *fiber.Ctx) error {
-	return c.SendString("Hello, World 👋!")
+	return c.SendString("Get user!")
 }
 
 func Store(c *fiber.Ctx) error {
@@ -20,9 +20,9 @@ func Store(c *fiber.Ctx) error {
 }
 
 func Edit(c *fiber.Ctx) error {
-	return c.SendString("Hello, World 👋!")
+	return c.SendString("Edit user!")
 }
 
 func Delete(c *fiber.Ctx) error {
-	return c.SendString("Hello, World 👋!")
+	return c.SendString("Delete user!")
 }
