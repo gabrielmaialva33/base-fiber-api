@@ -5,6 +5,7 @@ import (
 	"base-fiber-api/src/app/shared/utils"
 	"base-fiber-api/src/database"
 	"github.com/gofiber/fiber/v2"
+	"strings"
 )
 
 func List(c *fiber.Ctx) error {
@@ -16,26 +17,29 @@ func Get(c *fiber.Ctx) error {
 }
 
 func Store(c *fiber.Ctx) error {
-	data := map[string]interface{}{}
+	data := map[string]string{}
 	if err := c.BodyParser(&data); err != nil {
 		return c.Status(fiber.StatusBadRequest).SendString(err.Error())
 	}
 
 	user := models.User{
-		FirstName:       data["first_name"].(string),
-		LastName:        data["last_name"].(string),
-		Email:           data["email"].(string),
-		UserName:        data["user_name"].(string),
-		Password:        data["password"].(string),
-		ConfirmPassword: data["confirm_password"].(string),
+		FirstName:       data["first_name"],
+		LastName:        data["last_name"],
+		Email:           data["email"],
+		UserName:        data["user_name"],
+		Password:        data["password"],
+		ConfirmPassword: data["confirm_password"],
 	}
 
-	errors := utils.ValidateStruct(user)
-	if errors != nil {
+	if errors := utils.ValidateStruct(user); len(errors) > 0 {
 		return c.Status(fiber.StatusBadRequest).JSON(errors)
 	}
 
-	database.DB.Create(&user)
+	if err := database.DB.Create(&user).Error; err != nil {
+		if strings.Contains(err.Error(), "duplicate") || strings.Contains(err.Error(), "Duplicate") {
+			return c.Status(fiber.StatusConflict).JSON(map[string]string{"error": "User already exists"})
+		}
+	}
 
 	return c.JSON(user)
 }
