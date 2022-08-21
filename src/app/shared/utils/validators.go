@@ -23,13 +23,13 @@ func ValidateStruct(model interface{}) []*ErrorResponse {
 	err := validate.Struct(model)
 	if err != nil {
 		for _, err := range err.(validator.ValidationErrors) {
-			var element ErrorResponse
-			element.FailedField = err.StructNamespace()
-			element.Tag = err.Tag()
-			element.Field = underscore(err.Field())
-			element.Value = err.Value().(string)
-			element.Param = err.Param()
-			errors = append(errors, &element)
+			var response ErrorResponse
+			response.FailedField = err.StructNamespace()
+			response.Tag = err.Tag()
+			response.Field = underscore(err.Field())
+			response.Value = err.Value().(string)
+			response.Param = err.Param()
+			errors = append(errors, &response)
 		}
 	}
 
