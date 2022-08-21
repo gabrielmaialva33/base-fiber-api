@@ -20,8 +20,7 @@ func ValidateStruct(model interface{}) []*ErrorResponse {
 	validate = validator.New()
 	_ = validate.RegisterValidation("unique", Unique)
 
-	err := validate.Struct(model)
-	if err != nil {
+	if err := validate.Struct(model); err != nil {
 		for _, err := range err.(validator.ValidationErrors) {
 			var response ErrorResponse
 			response.FailedField = err.StructNamespace()
