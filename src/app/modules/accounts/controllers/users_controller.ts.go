@@ -5,7 +5,6 @@ import (
 	"base-fiber-api/src/app/shared/utils"
 	"base-fiber-api/src/database"
 	"github.com/gofiber/fiber/v2"
-	"strings"
 )
 
 func List(c *fiber.Ctx) error {
@@ -30,16 +29,11 @@ func Store(c *fiber.Ctx) error {
 		Password:        data["password"],
 		ConfirmPassword: data["confirm_password"],
 	}
-
 	if errors := utils.ValidateStruct(user); len(errors) > 0 {
 		return c.Status(fiber.StatusBadRequest).JSON(errors)
 	}
 
-	if err := database.DB.Create(&user).Error; err != nil {
-		if strings.Contains(err.Error(), "duplicate") || strings.Contains(err.Error(), "Duplicate") {
-			return c.Status(fiber.StatusConflict).JSON(map[string]string{"error": "User already exists"})
-		}
-	}
+	database.DB.Create(&user)
 
 	return c.JSON(user)
 }
