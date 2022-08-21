@@ -30,7 +30,10 @@ func Store(c *fiber.Ctx) error {
 		ConfirmPassword: data["confirm_password"],
 	}
 	if errors := utils.ValidateStruct(user); len(errors) > 0 {
-		return c.Status(fiber.StatusBadRequest).JSON(errors)
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"message": "Validation failed",
+			"errors":  errors,
+		})
 	}
 
 	database.DB.Create(&user)
