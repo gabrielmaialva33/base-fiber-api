@@ -1,11 +1,19 @@
 package controllers
 
 import (
+	"base-fiber-api/src/app/modules/accounts/interfaces"
 	"base-fiber-api/src/app/modules/accounts/models"
 	"base-fiber-api/src/app/shared/utils"
-	"base-fiber-api/src/database"
 	"github.com/gofiber/fiber/v2"
 )
+
+type UserServices struct {
+	ur interfaces.UserInterface
+}
+
+func UsersController(ur interfaces.UserInterface) *UserServices {
+	return &UserServices{ur}
+}
 
 func List(c *fiber.Ctx) error {
 	return c.SendString("List users!")
@@ -15,7 +23,7 @@ func Get(c *fiber.Ctx) error {
 	return c.SendString("Get user!")
 }
 
-func Store(c *fiber.Ctx) error {
+func (s *UserServices) Store(c *fiber.Ctx) error {
 	data := map[string]string{}
 	if err := c.BodyParser(&data); err != nil {
 		return c.Status(fiber.StatusBadRequest).SendString(err.Error())
@@ -36,9 +44,15 @@ func Store(c *fiber.Ctx) error {
 		})
 	}
 
-	database.DB.Create(&user)
+	newUser, err := s.ur.Store(&user)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"message": "Error while creating user",
+			"error":   err,
+		})
+	}
 
-	return c.JSON(user)
+	return c.JSON(newUser)
 }
 
 func Edit(c *fiber.Ctx) error {

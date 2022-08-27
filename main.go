@@ -1,6 +1,7 @@
 package main
 
 import (
+	"base-fiber-api/src/app/modules/accounts/controllers"
 	"base-fiber-api/src/app/modules/accounts/routes"
 	"base-fiber-api/src/database"
 	"github.com/gofiber/fiber/v2"
@@ -11,10 +12,14 @@ import (
 )
 
 func main() {
-	err := godotenv.Load()
-	if err != nil {
+
+	if err := godotenv.Load(); err != nil {
 		log.Fatal("Error loading .env file")
 	}
+
+	dsn := os.Getenv("DATABASE_URL")
+	services := database.NewRepositories(dsn)
+	services.Migrate()
 
 	app := fiber.New(fiber.Config{
 		EnableTrustedProxyCheck: true,
@@ -24,9 +29,8 @@ func main() {
 
 	app.Use(logger.New())
 
-	database.Connect()
-
-	routes.UserRoutes(app)
+	userController := controllers.UsersController(services.User)
+	routes.UserRoutes(app, userController)
 
 	_ = app.Listen(os.Getenv("HOST") + ":" + os.Getenv("PORT"))
 }
