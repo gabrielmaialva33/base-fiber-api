@@ -3,8 +3,10 @@ package controllers
 import (
 	"base-fiber-api/src/app/modules/accounts/interfaces"
 	"base-fiber-api/src/app/modules/accounts/models"
-	"base-fiber-api/src/app/shared/utils"
+	"base-fiber-api/src/app/shared/pkg"
+	"base-fiber-api/src/app/shared/validators"
 	"github.com/gofiber/fiber/v2"
+	"strconv"
 )
 
 type UserServices struct {
@@ -15,8 +17,24 @@ func UsersController(ur interfaces.UserInterface) *UserServices {
 	return &UserServices{ur}
 }
 
-func List(c *fiber.Ctx) error {
-	return c.SendString("List users!")
+func (s *UserServices) List(c *fiber.Ctx) error {
+	page, _ := strconv.Atoi(c.Query("page", "1"))
+	perPage, _ := strconv.Atoi(c.Query("per_page", "10"))
+	order := c.Query("order", "id")
+
+	users, err := s.ur.List(pkg.Pagination{
+		Page:    page,
+		PerPage: perPage,
+		Order:   order,
+	})
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"message": "Error while getting users",
+			"error":   err,
+		})
+	}
+
+	return c.JSON(users)
 }
 
 func Get(c *fiber.Ctx) error {
@@ -37,7 +55,7 @@ func (s *UserServices) Store(c *fiber.Ctx) error {
 		Password:        data["password"],
 		ConfirmPassword: data["confirm_password"],
 	}
-	if errors := utils.ValidateStruct(user); len(errors) > 0 {
+	if errors := validators.ValidateStruct(user); len(errors) > 0 {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"message": "Validation failed",
 			"errors":  errors,

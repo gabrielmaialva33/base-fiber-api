@@ -3,6 +3,8 @@ package repositories
 import (
 	"base-fiber-api/src/app/modules/accounts/interfaces"
 	"base-fiber-api/src/app/modules/accounts/models"
+	"base-fiber-api/src/app/shared/pkg"
+	"base-fiber-api/src/app/shared/scopes"
 	"gorm.io/gorm"
 )
 
@@ -16,9 +18,15 @@ func UserRepository(db *gorm.DB) *Gorm {
 
 var _ interfaces.UserInterface = &Gorm{}
 
-func (g Gorm) List() ([]models.User, error) {
-	//TODO implement me
-	panic("implement me")
+func (g Gorm) List(pagination pkg.Pagination) (*pkg.Pagination, error) {
+	var users []models.User
+
+	if err := g.db.Scopes(scopes.Paginate(users, &pagination, g.db)).Find(&users).Error; err != nil {
+		return nil, err
+	}
+	pagination.Data = users
+
+	return &pagination, nil
 }
 
 func (g Gorm) Get(id string) (*models.User, error) {

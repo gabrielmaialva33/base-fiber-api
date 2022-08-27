@@ -8,7 +8,7 @@ import (
 func UserRoutes(app *fiber.App, controller *controllers.UserServices) {
 	api := app.Group("/users")
 
-	api.Get("/", controllers.List).Name("users.list")
+	api.Get("/", controller.List).Name("users.list")
 	api.Get("/:id", controllers.Get).Name("users.get")
 	api.Post("/", controller.Store).Name("users.store")
 	api.Put("/:id", controllers.Edit).Name("users.edit")

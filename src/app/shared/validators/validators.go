@@ -1,6 +1,7 @@
-package utils
+package validators
 
 import (
+	"base-fiber-api/src/app/shared/utils"
 	"base-fiber-api/src/database"
 	"github.com/go-playground/validator/v10"
 )
@@ -25,7 +26,7 @@ func ValidateStruct(model interface{}) []*ErrorResponse {
 			var response ErrorResponse
 			response.FailedField = err.StructNamespace()
 			response.Tag = err.Tag()
-			response.Field = underscore(err.Field())
+			response.Field = utils.Underscore(err.Field())
 			response.Value = err.Value().(string)
 			response.Param = err.Param()
 			errors = append(errors, &response)
@@ -39,7 +40,7 @@ func Unique(fl validator.FieldLevel) bool {
 	var count int64
 
 	model := fl.Top().Interface()
-	field := underscore(fl.StructFieldName())
+	field := utils.Underscore(fl.StructFieldName())
 	value := fl.Field().String()
 
 	database.DB.Model(model).Where(field+" = ?", value).Count(&count)

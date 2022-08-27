@@ -3,14 +3,15 @@ package services
 import (
 	"base-fiber-api/src/app/modules/accounts/interfaces"
 	"base-fiber-api/src/app/modules/accounts/models"
+	"base-fiber-api/src/app/shared/pkg"
 )
 
 type UserRepository struct {
 	ur interfaces.UserInterface
 }
 
-func (u UserRepository) List() ([]models.User, error) {
-	return u.ur.List()
+func (u UserRepository) List(pagination pkg.Pagination) (*pkg.Pagination, error) {
+	return u.ur.List(pagination)
 }
 
 func (u UserRepository) Get(id string) (*models.User, error) {
