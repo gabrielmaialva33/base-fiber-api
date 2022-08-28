@@ -30,7 +30,7 @@ func (s *UserServices) List(c *fiber.Ctx) error {
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"message": "Error while getting users",
-			"error":   err,
+			"error":   err.Error(),
 		})
 	}
 
