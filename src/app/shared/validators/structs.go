@@ -3,10 +3,7 @@ package validators
 import (
 	"base-fiber-api/src/app/shared/utils"
 	"base-fiber-api/src/database"
-	"fmt"
 	"github.com/go-playground/validator/v10"
-	"os"
-	"reflect"
 )
 
 type ErrorResponse struct {
@@ -49,11 +46,4 @@ func Unique(fl validator.FieldLevel) bool {
 	database.DB.Model(model).Where(field+" = ?", value).Count(&count)
 
 	return count == 0
-}
-
-func FieldExists(model interface{}, field string) {
-	modelType := reflect.TypeOf(model)
-
-	fmt.Fprintf(os.Stdout, "modelType: %v", modelType)
-
 }

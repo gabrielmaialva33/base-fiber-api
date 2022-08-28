@@ -30,20 +30,25 @@ func (g Gorm) List(pagination pkg.Pagination) (*pkg.Pagination, error) {
 }
 
 func (g Gorm) Get(id string) (*models.User, error) {
-	//TODO implement me
-	panic("implement me")
+	var user models.User
+	if err := g.db.Where("id = ?", id).First(&user).Error; err != nil {
+		return nil, err
+	}
+	return &user, nil
 }
 
 func (g Gorm) Store(user *models.User) (*models.User, error) {
-	if err := g.db.Debug().Create(&user).Error; err != nil {
+	if err := g.db.Create(&user).Error; err != nil {
 		return nil, err
 	}
 	return user, nil
 }
 
 func (g Gorm) Edit(model *models.User) (*models.User, error) {
-	//TODO implement me
-	panic("implement me")
+	if err := g.db.Save(&model).Error; err != nil {
+		return nil, err
+	}
+	return model, nil
 }
 
 func (g Gorm) Delete(model *models.User) error {

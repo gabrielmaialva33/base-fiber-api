@@ -28,7 +28,7 @@ func (s *UserServices) List(c *fiber.Ctx) error {
 		Order:   order,
 	})
 	if err != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"message": "Error while getting users",
 			"error":   err.Error(),
 		})
@@ -37,14 +37,31 @@ func (s *UserServices) List(c *fiber.Ctx) error {
 	return c.JSON(users)
 }
 
-func Get(c *fiber.Ctx) error {
-	return c.SendString("Get user!")
+func (s *UserServices) Get(c *fiber.Ctx) error {
+	uuid := c.Params("id")
+
+	if validators.ValidateUUID(uuid) == false {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"message": "Invalid UUID",
+		})
+	}
+
+	user, err := s.ur.Get(uuid)
+	if err != nil {
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
+			"message": "User not found",
+		})
+	}
+
+	return c.JSON(user)
 }
 
 func (s *UserServices) Store(c *fiber.Ctx) error {
 	data := map[string]string{}
 	if err := c.BodyParser(&data); err != nil {
-		return c.Status(fiber.StatusBadRequest).SendString(err.Error())
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"message": "Error while parsing data",
+		})
 	}
 
 	user := models.User{
@@ -73,10 +90,60 @@ func (s *UserServices) Store(c *fiber.Ctx) error {
 	return c.JSON(newUser)
 }
 
-func Edit(c *fiber.Ctx) error {
-	return c.SendString("Edit user!")
+func (s *UserServices) Edit(c *fiber.Ctx) error {
+	uuid := c.Params("id")
+	if validators.ValidateUUID(uuid) == false {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"message": "Invalid UUID",
+		})
+	}
+
+	data := map[string]string{}
+	if err := c.BodyParser(&data); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"message": "Error while parsing data",
+		})
+	}
+
+	user, err := s.ur.Get(uuid)
+	if err != nil {
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
+			"message": "User not found",
+		})
+	}
+
+	user.FirstName = data["first_name"]
+	user.LastName = data["last_name"]
+	user.Email = data["email"]
+	user.UserName = data["user_name"]
+	user.Password = data["password"]
+	user.ConfirmPassword = data["confirm_password"]
+
+	if errors := validators.ValidateStruct(user); len(errors) > 0 {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"message": "Validation failed",
+			"errors":  errors,
+		})
+	}
+
+	updatedUser, err := s.ur.Edit(user)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"message": "Error while updating user",
+			"error":   err,
+		})
+	}
+
+	return c.JSON(updatedUser)
 }
 
-func Delete(c *fiber.Ctx) error {
-	return c.SendString("Delete user!")
+func (s *UserServices) Delete(c *fiber.Ctx) error {
+	uuid := c.Params("id")
+	if validators.ValidateUUID(uuid) == false {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"message": "Invalid UUID",
+		})
+	}
+
+	return c.JSON(uuid)
 }
