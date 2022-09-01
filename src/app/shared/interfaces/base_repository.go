@@ -10,4 +10,5 @@ type BaseRepository[T interface{}] interface {
 	Store(model *T) (*T, error)
 	Edit(id string, model *T) (*T, error)
 	Delete(id string, model *T) error
+	FindBy(field string, value string) (*T, error)
 }

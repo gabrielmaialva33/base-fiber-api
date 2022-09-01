@@ -4,6 +4,7 @@ import (
 	"base-fiber-api/src/app/modules/accounts/interfaces"
 	"base-fiber-api/src/app/modules/accounts/models"
 	"base-fiber-api/src/app/shared/pkg"
+	"base-fiber-api/src/app/shared/utils"
 	"base-fiber-api/src/app/shared/validators"
 	"github.com/gofiber/fiber/v2"
 	"github.com/imdario/mergo"
@@ -169,5 +170,40 @@ func (s *UserServices) Delete(c *fiber.Ctx) error {
 
 	return c.JSON(fiber.Map{
 		"message": "User deleted",
+	})
+}
+
+func (s *UserServices) Login(c *fiber.Ctx) error {
+	data := map[string]string{}
+	if err := c.BodyParser(&data); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"message": "Error while parsing data",
+		})
+	}
+
+	user, err := s.ur.FindBy("user_name", data["uid"])
+	if err != nil {
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
+			"message": "User not found",
+		})
+	}
+
+	match, err := pkg.ComparePasswordAndHash(data["password"], user.Password)
+	if err != nil || match == false {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"message": "Error while comparing password",
+		})
+	}
+
+	token, err := utils.GenerateJwt(user.Id)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"message": "Error while generating token",
+			"error":   err,
+		})
+	}
+
+	return c.JSON(fiber.Map{
+		"token": token,
 	})
 }

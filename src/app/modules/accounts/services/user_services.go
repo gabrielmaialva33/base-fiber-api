@@ -30,4 +30,8 @@ func (u UserRepository) Delete(id string, user *models.User) error {
 	return u.ur.Delete(id, user)
 }
 
+func (u UserRepository) FindBy(field string, value string) (*models.User, error) {
+	return u.ur.FindBy(field, value)
+}
+
 var _ interfaces.UserInterface = &UserRepository{}

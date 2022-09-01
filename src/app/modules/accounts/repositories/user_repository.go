@@ -59,3 +59,11 @@ func (g Gorm) Delete(id string, model *models.User) error {
 	}
 	return nil
 }
+
+func (g Gorm) FindBy(field string, value string) (*models.User, error) {
+	var user models.User
+	if err := g.db.Where(field+" = ?", value).First(&user).Error; err != nil {
+		return nil, err
+	}
+	return &user, nil
+}

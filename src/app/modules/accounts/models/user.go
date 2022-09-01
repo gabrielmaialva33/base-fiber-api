@@ -28,16 +28,6 @@ type UserPublic struct {
 	UserName  string `json:"user_name"`
 }
 
-// BeforeSave hook executed before saving a User to the database.
-func (u *User) BeforeSave(*gorm.DB) error {
-	hash, err := pkg.CreateHash(u.Password, pkg.DefaultParams)
-	if err != nil {
-		return err
-	}
-	u.Password = hash
-	return nil
-}
-
 // PublicUser returns a public representation of a user.
 func (u *User) PublicUser() interface{} {
 	return &UserPublic{
@@ -56,4 +46,14 @@ func (users Users) PublicUsers() []interface{} {
 		result[i] = user.PublicUser()
 	}
 	return result
+}
+
+// BeforeSave hook executed before saving a User to the database.
+func (u *User) BeforeSave(*gorm.DB) error {
+	hash, err := pkg.CreateHash(u.Password, pkg.DefaultParams)
+	if err != nil {
+		return err
+	}
+	u.Password = hash
+	return nil
 }
