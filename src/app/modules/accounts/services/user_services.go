@@ -22,12 +22,12 @@ func (u UserRepository) Store(user *models.User) (*models.User, error) {
 	return u.ur.Store(user)
 }
 
-func (u UserRepository) Edit(user *models.User) (*models.User, error) {
-	return u.ur.Edit(user)
+func (u UserRepository) Edit(id string, user *models.User) (*models.User, error) {
+	return u.ur.Edit(id, user)
 }
 
-func (u UserRepository) Delete(user *models.User) error {
-	return u.ur.Delete(user)
+func (u UserRepository) Delete(id string, user *models.User) error {
+	return u.ur.Delete(id, user)
 }
 
 var _ interfaces.UserInterface = &UserRepository{}

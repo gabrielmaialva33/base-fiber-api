@@ -8,6 +8,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/imdario/mergo"
 	"strconv"
+	"strings"
 )
 
 type UserServices struct {
@@ -147,5 +148,26 @@ func (s *UserServices) Delete(c *fiber.Ctx) error {
 		})
 	}
 
-	return c.JSON(uuid)
+	user, err := s.ur.Get(uuid)
+	if err != nil {
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
+			"message": "User not found",
+		})
+	}
+
+	deleteUser := models.User{
+		Email:    "deleted:" + user.Email + ":" + strings.Split(user.Id, "-")[0],
+		UserName: "deleted:" + user.UserName + ":" + strings.Split(user.Id, "-")[0],
+	}
+
+	if err := s.ur.Delete(user.Id, &deleteUser); err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"message": "Error while deleting user",
+			"error":   err,
+		})
+	}
+
+	return c.JSON(fiber.Map{
+		"message": "User deleted",
+	})
 }

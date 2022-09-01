@@ -52,7 +52,10 @@ func (g Gorm) Edit(id string, model *models.User) (*models.User, error) {
 	return model, nil
 }
 
-func (g Gorm) Delete(model *models.User) error {
-	//TODO implement me
-	panic("implement me")
+func (g Gorm) Delete(id string, model *models.User) error {
+	g.db.Where("id = ?", id).Updates(&model)
+	if err := g.db.Where("id = ?", id).Delete(&model).Error; err != nil {
+		return err
+	}
+	return nil
 }

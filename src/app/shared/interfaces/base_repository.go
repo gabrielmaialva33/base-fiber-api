@@ -9,5 +9,5 @@ type BaseRepository[T interface{}] interface {
 	Get(id string) (*T, error)
 	Store(model *T) (*T, error)
 	Edit(id string, model *T) (*T, error)
-	Delete(model *T) error
+	Delete(id string, model *T) error
 }
