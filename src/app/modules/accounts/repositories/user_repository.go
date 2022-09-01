@@ -6,6 +6,7 @@ import (
 	"base-fiber-api/src/app/shared/pkg"
 	"base-fiber-api/src/app/shared/scopes"
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 )
 
 type Gorm struct {
@@ -19,12 +20,12 @@ func UserRepository(db *gorm.DB) *Gorm {
 var _ interfaces.UserInterface = &Gorm{}
 
 func (g Gorm) List(pagination pkg.Pagination) (*pkg.Pagination, error) {
-	var users []models.User
+	var users models.Users
 
 	if err := g.db.Scopes(scopes.Paginate(users, &pagination, g.db)).Find(&users).Error; err != nil {
 		return nil, err
 	}
-	pagination.Data = users
+	pagination.Data = users.PublicUsers()
 
 	return &pagination, nil
 }
@@ -44,8 +45,8 @@ func (g Gorm) Store(user *models.User) (*models.User, error) {
 	return user, nil
 }
 
-func (g Gorm) Edit(model *models.User) (*models.User, error) {
-	if err := g.db.Save(&model).Error; err != nil {
+func (g Gorm) Edit(id string, model *models.User) (*models.User, error) {
+	if err := g.db.Clauses(clause.Returning{}).Where("id = ?", id).Updates(&model).Error; err != nil {
 		return nil, err
 	}
 	return model, nil

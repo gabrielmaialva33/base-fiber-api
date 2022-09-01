@@ -6,6 +6,7 @@ import (
 	"base-fiber-api/src/app/shared/pkg"
 	"base-fiber-api/src/app/shared/validators"
 	"github.com/gofiber/fiber/v2"
+	"github.com/imdario/mergo"
 	"strconv"
 )
 
@@ -53,25 +54,25 @@ func (s *UserServices) Get(c *fiber.Ctx) error {
 		})
 	}
 
-	return c.JSON(user)
+	return c.JSON(user.PublicUser())
 }
 
 func (s *UserServices) Store(c *fiber.Ctx) error {
-	data := map[string]string{}
+	data := models.User{}
 	if err := c.BodyParser(&data); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"message": "Error while parsing data",
 		})
 	}
 
-	user := models.User{
-		FirstName:       data["first_name"],
-		LastName:        data["last_name"],
-		Email:           data["email"],
-		UserName:        data["user_name"],
-		Password:        data["password"],
-		ConfirmPassword: data["confirm_password"],
+	user := models.User{}
+	if err := mergo.Merge(&user, data); err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"message": "Error while merging data",
+			"error":   err.Error(),
+		})
 	}
+
 	if errors := validators.ValidateStruct(user); len(errors) > 0 {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"message": "Validation failed",
@@ -87,7 +88,7 @@ func (s *UserServices) Store(c *fiber.Ctx) error {
 		})
 	}
 
-	return c.JSON(newUser)
+	return c.JSON(newUser.PublicUser())
 }
 
 func (s *UserServices) Edit(c *fiber.Ctx) error {
@@ -98,7 +99,7 @@ func (s *UserServices) Edit(c *fiber.Ctx) error {
 		})
 	}
 
-	data := map[string]string{}
+	data := models.User{}
 	if err := c.BodyParser(&data); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"message": "Error while parsing data",
@@ -112,21 +113,22 @@ func (s *UserServices) Edit(c *fiber.Ctx) error {
 		})
 	}
 
-	user.FirstName = data["first_name"]
-	user.LastName = data["last_name"]
-	user.Email = data["email"]
-	user.UserName = data["user_name"]
-	user.Password = data["password"]
-	user.ConfirmPassword = data["confirm_password"]
+	emptyUser := models.User{}
+	if err := mergo.Merge(&emptyUser, data); err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"message": "Error while merging data",
+			"error":   err.Error(),
+		})
+	}
 
-	if errors := validators.ValidateStruct(user); len(errors) > 0 {
+	if errors := validators.ValidatePartialStruct(emptyUser); len(errors) > 0 {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"message": "Validation failed",
 			"errors":  errors,
 		})
 	}
 
-	updatedUser, err := s.ur.Edit(user)
+	editedUser, err := s.ur.Edit(user.Id, &emptyUser)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"message": "Error while updating user",
@@ -134,7 +136,7 @@ func (s *UserServices) Edit(c *fiber.Ctx) error {
 		})
 	}
 
-	return c.JSON(updatedUser)
+	return c.JSON(editedUser.PublicUser())
 }
 
 func (s *UserServices) Delete(c *fiber.Ctx) error {
