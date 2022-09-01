@@ -1,8 +1,8 @@
 package main
 
 import (
-	"base-fiber-api/src/app/modules/accounts/controllers"
-	"base-fiber-api/src/app/modules/accounts/routes"
+	"base-fiber-api/src/app/modules/accounts/http/controllers"
+	"base-fiber-api/src/app/modules/accounts/http/routes"
 	"base-fiber-api/src/database"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/logger"
