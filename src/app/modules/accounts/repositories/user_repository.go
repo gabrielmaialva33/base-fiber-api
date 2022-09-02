@@ -5,6 +5,7 @@ import (
 	"base-fiber-api/src/app/modules/accounts/models"
 	"base-fiber-api/src/app/shared/pkg"
 	"base-fiber-api/src/app/shared/scopes"
+	"errors"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 )
@@ -66,4 +67,15 @@ func (g Gorm) FindBy(field string, value string) (*models.User, error) {
 		return nil, err
 	}
 	return &user, nil
+}
+
+func (g Gorm) FindManyBy(field []string, value string) (*models.User, error) {
+	var user models.User
+	for _, f := range field {
+		g.db.Where(f+" = ?", value).First(&user)
+		if user.Id != "" {
+			return &user, nil
+		}
+	}
+	return nil, errors.New("user not found")
 }

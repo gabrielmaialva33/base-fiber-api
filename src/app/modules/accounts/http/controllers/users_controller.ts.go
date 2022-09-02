@@ -174,21 +174,28 @@ func (s *UserServices) Delete(c *fiber.Ctx) error {
 }
 
 func (s *UserServices) Login(c *fiber.Ctx) error {
-	data := map[string]string{}
+	data := models.Login{}
 	if err := c.BodyParser(&data); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"message": "Error while parsing data",
 		})
 	}
 
-	user, err := s.ur.FindBy("user_name", data["uid"])
+	if errors := validators.ValidateStruct(data); len(errors) > 0 {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"message": "Validation failed",
+			"errors":  errors,
+		})
+	}
+
+	user, err := s.ur.FindManyBy([]string{"email", "user_name"}, data.Uid)
 	if err != nil {
 		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
 			"message": "User not found",
 		})
 	}
 
-	match, err := pkg.ComparePasswordAndHash(data["password"], user.Password)
+	match, err := pkg.ComparePasswordAndHash(data.Password, user.Password)
 	if err != nil || match == false {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"message": "Error while comparing password",
@@ -204,6 +211,8 @@ func (s *UserServices) Login(c *fiber.Ctx) error {
 	}
 
 	return c.JSON(fiber.Map{
-		"token": token,
+		"message": "Login successful",
+		"user":    user.PublicUser(),
+		"token":   token,
 	})
 }

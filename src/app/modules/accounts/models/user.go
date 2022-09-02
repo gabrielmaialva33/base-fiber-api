@@ -57,3 +57,8 @@ func (u *User) BeforeSave(*gorm.DB) error {
 	u.Password = hash
 	return nil
 }
+
+type Login struct {
+	Uid      string `json:"uid" validate:"required"`
+	Password string `json:"password" validate:"required"`
+}

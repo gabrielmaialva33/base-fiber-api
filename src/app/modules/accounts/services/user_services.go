@@ -34,4 +34,8 @@ func (u UserRepository) FindBy(field string, value string) (*models.User, error)
 	return u.ur.FindBy(field, value)
 }
 
+func (u UserRepository) FindManyBy(field []string, value string) (*models.User, error) {
+	return u.ur.FindManyBy(field, value)
+}
+
 var _ interfaces.UserInterface = &UserRepository{}

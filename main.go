@@ -19,7 +19,7 @@ func main() {
 
 	dsn := os.Getenv("DATABASE_URL")
 	services := database.NewRepositories(dsn)
-	services.Drop()
+	//services.Drop()
 	services.Migrate()
 
 	app := fiber.New(fiber.Config{

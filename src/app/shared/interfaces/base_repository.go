@@ -11,4 +11,5 @@ type BaseRepository[T interface{}] interface {
 	Edit(id string, model *T) (*T, error)
 	Delete(id string, model *T) error
 	FindBy(field string, value string) (*T, error)
+	FindManyBy(field []string, value string) (*T, error)
 }
