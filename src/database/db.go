@@ -25,7 +25,7 @@ func NewRepositories(dsn string) *Repositories {
 	}
 
 	DB = database
-	
+
 	return &Repositories{
 		User: repositories.UserRepository(database),
 		db:   database,
@@ -34,14 +34,53 @@ func NewRepositories(dsn string) *Repositories {
 
 func (r Repositories) Migrate() {
 	r.db.Exec("CREATE EXTENSION IF NOT EXISTS \"uuid-ossp\";")
-	r.db.AutoMigrate(&models.User{})
+	r.db.AutoMigrate(&models.User{}, &models.Role{})
 }
 
 func (r Repositories) Drop() {
 	r.db.Exec("DROP EXTENSION IF EXISTS \"uuid-ossp\";")
-	r.db.Migrator().DropTable(&models.User{})
+	r.db.Migrator().DropTable(&models.User{}, &models.Role{})
 }
 
 func (r Repositories) Seed() {
-	//TODO implement me
+	roles := []models.Role{
+		{
+			Name: "root",
+			Slug: "Root",
+		},
+		{
+			Name: "admin",
+			Slug: "Admin",
+		},
+		{
+			Name: "user",
+			Slug: "User",
+		},
+	}
+	users := []models.User{
+		{
+			FirstName: "Root",
+			LastName:  "System",
+			Email:     "root@go.com",
+			UserName:  "root",
+			Password:  "123456",
+		},
+		{
+			FirstName: "Admin",
+			LastName:  "System",
+			Email:     "admin@go.com",
+			UserName:  "admin",
+			Password:  "123456",
+		},
+		{
+			FirstName: "Gabriel",
+			LastName:  "Maia",
+			Email:     "maia@go.com",
+			UserName:  "maia",
+			Password:  "123456",
+		},
+	}
+
+	r.db.Create(&roles)
+	r.db.Create(&users)
 }
