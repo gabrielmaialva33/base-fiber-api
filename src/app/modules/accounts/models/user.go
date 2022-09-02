@@ -7,16 +7,21 @@ import (
 )
 
 type User struct {
-	Id              string         `gorm:"primary_key;default:uuid_generate_v4()" json:"id"`
-	FirstName       string         `gorm:"column:first_name;size:80;not null" json:"first_name" validate:"required,min=2,max=80,alpha,omitempty"`
-	LastName        string         `gorm:"column:last_name;size:80;not null" json:"last_name" validate:"required,min=2,max=80,alpha,omitempty"`
+	gorm.Model
+
+	Id              string         `gorm:"primaryKey;default:uuid_generate_v4();" json:"id"`
+	FirstName       string         `gorm:"column:first_name;size:80;not null;" json:"first_name" validate:"required,min=2,max=80,alpha,omitempty"`
+	LastName        string         `gorm:"column:last_name;size:80;not null;" json:"last_name" validate:"required,min=2,max=80,alpha,omitempty"`
 	Email           string         `gorm:"column:email;size:255;not null;unique;unique;index;" json:"email" validate:"required,email,max=247,unique,omitempty"`
 	UserName        string         `gorm:"column:user_name;size:58;not null;unique;index;" json:"user_name" validate:"required,min=4,max=50,unique,omitempty"`
-	Password        string         `gorm:"column:password;size:255;not null" json:"password" form:"password" validate:"required,min=6,max=50,omitempty"`
+	Password        string         `gorm:"column:password;size:255;not null;" json:"password" form:"password" validate:"required,min=6,max=50,omitempty"`
 	ConfirmPassword string         `gorm:"-" json:"confirm_password" form:"confirm_password" validate:"required,min=6,max=50,eqfield=Password,omitempty"`
-	CreatedAt       time.Time      `gorm:"column:created_at;not null;default:CURRENT_TIMESTAMP" json:"-"`
-	UpdatedAt       time.Time      `gorm:"column:updated_at;not null;default:CURRENT_TIMESTAMP" json:"-"`
-	DeletedAt       gorm.DeletedAt `gorm:"column:deleted_at;index,default:null" json:"-"`
+	CreatedAt       time.Time      `gorm:"column:created_at;not null;default:CURRENT_TIMESTAMP;" json:"-"`
+	UpdatedAt       time.Time      `gorm:"column:updated_at;not null;default:CURRENT_TIMESTAMP;" json:"-"`
+	DeletedAt       gorm.DeletedAt `gorm:"column:deleted_at;index,default:null;" json:"-"`
+
+	// Relations
+	Roles []*Role `gorm:"many2many:user_roles;" json:"roles"`
 }
 type Users []User
 
