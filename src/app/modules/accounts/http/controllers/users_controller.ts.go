@@ -115,7 +115,9 @@ func (s *UserServices) Edit(c *fiber.Ctx) error {
 		})
 	}
 
-	emptyUser := models.User{}
+	emptyUser := models.User{
+		Id: user.Id,
+	}
 	if err := mergo.Merge(&emptyUser, data); err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"message": "Error while merging data",
@@ -130,7 +132,7 @@ func (s *UserServices) Edit(c *fiber.Ctx) error {
 		})
 	}
 
-	editedUser, err := s.ur.Edit(user.Id, &emptyUser)
+	editedUser, err := s.ur.Edit(&emptyUser)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"message": "Error while updating user",

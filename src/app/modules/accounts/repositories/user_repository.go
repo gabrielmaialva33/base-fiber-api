@@ -46,8 +46,8 @@ func (g Gorm) Store(user *models.User) (*models.User, error) {
 	return user, nil
 }
 
-func (g Gorm) Edit(id string, model *models.User) (*models.User, error) {
-	if err := g.db.Clauses(clause.Returning{}).Where("id = ?", id).Updates(&model).Error; err != nil {
+func (g Gorm) Edit(model *models.User) (*models.User, error) {
+	if err := g.db.Clauses(clause.Returning{}).Where("id = ?", model.Id).Updates(&model).Error; err != nil {
 		return nil, err
 	}
 	return model, nil
