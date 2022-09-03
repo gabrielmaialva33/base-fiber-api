@@ -11,6 +11,7 @@ import (
 
 type Repositories struct {
 	User interfaces.UserInterface
+	Role interfaces.RoleInterface
 	db   *gorm.DB
 }
 
@@ -28,6 +29,7 @@ func NewRepositories(dsn string) *Repositories {
 
 	return &Repositories{
 		User: repositories.UserRepository(database),
+		Role: repositories.RoleRepository(database),
 		db:   database,
 	}
 }

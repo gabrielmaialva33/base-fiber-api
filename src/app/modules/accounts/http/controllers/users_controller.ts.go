@@ -53,6 +53,7 @@ func (s *UserServices) Get(c *fiber.Ctx) error {
 	if err != nil {
 		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
 			"message": "User not found",
+			"error":   err.Error(),
 		})
 	}
 
@@ -64,6 +65,7 @@ func (s *UserServices) Store(c *fiber.Ctx) error {
 	if err := c.BodyParser(&data); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"message": "Error while parsing data",
+			"error":   err.Error(),
 		})
 	}
 
@@ -86,7 +88,7 @@ func (s *UserServices) Store(c *fiber.Ctx) error {
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"message": "Error while creating user",
-			"error":   err,
+			"error":   err.Error(),
 		})
 	}
 
@@ -105,6 +107,7 @@ func (s *UserServices) Edit(c *fiber.Ctx) error {
 	if err := c.BodyParser(&data); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"message": "Error while parsing data",
+			"error":   err.Error(),
 		})
 	}
 
@@ -112,6 +115,7 @@ func (s *UserServices) Edit(c *fiber.Ctx) error {
 	if err != nil {
 		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
 			"message": "User not found",
+			"error":   err.Error(),
 		})
 	}
 
@@ -136,7 +140,7 @@ func (s *UserServices) Edit(c *fiber.Ctx) error {
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"message": "Error while updating user",
-			"error":   err,
+			"error":   err.Error(),
 		})
 	}
 
@@ -155,18 +159,20 @@ func (s *UserServices) Delete(c *fiber.Ctx) error {
 	if err != nil {
 		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
 			"message": "User not found",
+			"error":   err.Error(),
 		})
 	}
 
 	deleteUser := models.User{
+		Id:       user.Id,
 		Email:    "deleted:" + user.Email + ":" + strings.Split(user.Id, "-")[0],
 		UserName: "deleted:" + user.UserName + ":" + strings.Split(user.Id, "-")[0],
 	}
 
-	if err := s.ur.Delete(user.Id, &deleteUser); err != nil {
+	if err := s.ur.Delete(&deleteUser); err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"message": "Error while deleting user",
-			"error":   err,
+			"error":   err.Error(),
 		})
 	}
 
@@ -180,6 +186,7 @@ func (s *UserServices) Login(c *fiber.Ctx) error {
 	if err := c.BodyParser(&data); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"message": "Error while parsing data",
+			"error":   err.Error(),
 		})
 	}
 
@@ -194,6 +201,7 @@ func (s *UserServices) Login(c *fiber.Ctx) error {
 	if err != nil {
 		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
 			"message": "User not found",
+			"error":   err.Error(),
 		})
 	}
 
@@ -201,6 +209,7 @@ func (s *UserServices) Login(c *fiber.Ctx) error {
 	if err != nil || match == false {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"message": "Error while comparing password",
+			"error":   err.Error(),
 		})
 	}
 
@@ -208,7 +217,7 @@ func (s *UserServices) Login(c *fiber.Ctx) error {
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"message": "Error while generating token",
-			"error":   err,
+			"error":   err.Error(),
 		})
 	}
 

@@ -32,7 +32,9 @@ func main() {
 	app.Use(logger.New())
 
 	userController := controllers.UsersController(services.User)
+	roleController := controllers.RolesController(services.Role)
 	routes.UserRoutes(app, userController)
+	routes.RoleRoutes(app, roleController)
 
 	_ = app.Listen(os.Getenv("HOST") + ":" + os.Getenv("PORT"))
 }

@@ -18,3 +18,25 @@ type Role struct {
 	// Relations
 	Users []*User `gorm:"many2many:user_roles;" json:"users"`
 }
+
+type Roles []Role
+
+type RolePublic struct {
+	Id   string `json:"id"`
+	Slug string `json:"slug"`
+}
+
+func (r *Role) PublicRole() interface{} {
+	return &RolePublic{
+		Id:   r.Id,
+		Slug: r.Slug,
+	}
+}
+
+func (roles Roles) PublicRoles() []interface{} {
+	result := make([]interface{}, len(roles))
+	for i, role := range roles {
+		result[i] = role.PublicRole()
+	}
+	return result
+}
