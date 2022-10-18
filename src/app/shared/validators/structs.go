@@ -3,7 +3,10 @@ package validators
 import (
 	"base-fiber-api/src/app/shared/utils"
 	"base-fiber-api/src/database"
+	"github.com/go-playground/locales/pt_BR"
+	ut "github.com/go-playground/universal-translator"
 	"github.com/go-playground/validator/v10"
+	ptbr2 "github.com/go-playground/validator/v10/translations/pt_BR"
 	"reflect"
 )
 
@@ -13,6 +16,7 @@ type ErrorResponse struct {
 	Field       string `json:"field"`
 	Value       string `json:"value"`
 	Param       string `json:"param"`
+	Message     string `json:"message"`
 }
 
 var validate *validator.Validate
@@ -20,8 +24,26 @@ var validate *validator.Validate
 // ValidateStruct validates a struct (all the fields)
 func ValidateStruct(model interface{}) []*ErrorResponse {
 	var errors []*ErrorResponse
+	//var messages []string
+
 	validate = validator.New()
 	_ = validate.RegisterValidation("unique", Unique)
+
+	// Register translations
+	pt := pt_BR.New()
+	uni := ut.New(pt, pt)
+	trans, _ := uni.GetTranslator("pt_BR")
+	if err := ptbr2.RegisterDefaultTranslations(validate, trans); err != nil {
+		panic(err)
+	}
+
+	// Custom translations for custom tags
+	_ = validate.RegisterTranslation("unique", trans, func(ut ut.Translator) error {
+		return ut.Add("unique", "{0} já está em uso", true)
+	}, func(ut ut.Translator, fe validator.FieldError) string {
+		t, _ := ut.T("unique", fe.Field())
+		return t
+	})
 
 	if err := validate.Struct(model); err != nil {
 		for _, err := range err.(validator.ValidationErrors) {
@@ -31,11 +53,13 @@ func ValidateStruct(model interface{}) []*ErrorResponse {
 			response.Field = utils.Underscore(err.Field())
 			response.Value = err.Value().(string)
 			response.Param = err.Param()
+			response.Message = err.Translate(trans)
 			errors = append(errors, &response)
+			//messages = append(messages, response.Message)
 		}
 	}
 
-	return errors
+	return errors //, messages
 }
 
 // ValidatePartialStruct validates a partial struct (only the fields that are present)

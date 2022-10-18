@@ -33,6 +33,7 @@ func main() {
 
 	userController := controllers.UsersController(services.User)
 	roleController := controllers.RolesController(services.Role)
+
 	routes.UserRoutes(app, userController)
 	routes.RoleRoutes(app, roleController)
 

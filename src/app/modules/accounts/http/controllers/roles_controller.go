@@ -30,7 +30,7 @@ func (r RoleServices) List(c *fiber.Ctx) error {
 		Order:   order,
 	})
 	if err != nil {
-		c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"message": "Error while getting roles",
 			"error":   err.Error(),
 		})
@@ -42,9 +42,15 @@ func (r RoleServices) List(c *fiber.Ctx) error {
 func (r RoleServices) Get(c *fiber.Ctx) error {
 	uuid := c.Params("id")
 
+	if validators.ValidateUUID(uuid) == false {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"message": "Invalid UUID",
+		})
+	}
+
 	role, err := r.rr.Get(uuid)
 	if err != nil {
-		c.Status(fiber.StatusNotFound).JSON(fiber.Map{
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
 			"message": "Role not found",
 			"error":   err.Error(),
 		})
@@ -56,7 +62,7 @@ func (r RoleServices) Get(c *fiber.Ctx) error {
 func (r RoleServices) Store(c *fiber.Ctx) error {
 	data := models.Role{}
 	if err := c.BodyParser(&data); err != nil {
-		c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"message": "Error while parsing body",
 			"error":   err.Error(),
 		})
@@ -81,7 +87,7 @@ func (r RoleServices) Store(c *fiber.Ctx) error {
 
 	newRole, err := r.rr.Store(&role)
 	if err != nil {
-		c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"message": "Error while creating role",
 			"error":   err.Error(),
 		})
