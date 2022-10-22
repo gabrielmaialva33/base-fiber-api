@@ -8,6 +8,7 @@ import (
 	"github.com/go-playground/validator/v10"
 	ptbr2 "github.com/go-playground/validator/v10/translations/pt_BR"
 	"reflect"
+	"regexp"
 )
 
 type ErrorResponse struct {
@@ -27,6 +28,8 @@ func ValidateStruct(model interface{}) []*ErrorResponse {
 	//var messages []string
 
 	validate = validator.New()
+
+	// Register custom validators
 	_ = validate.RegisterValidation("unique", Unique)
 
 	// Register translations
@@ -102,4 +105,10 @@ func Unique(fl validator.FieldLevel) bool {
 	database.DB.Model(model).Where(field+" = ?", value).Count(&count)
 
 	return count == 0
+}
+
+// UUID checks if a field is a valid UUID
+func UUID(fl validator.FieldLevel) bool {
+	r := regexp.MustCompile("^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-4[a-fA-F0-9]{3}-[8|9|aA|bB][a-fA-F0-9]{3}-[a-fA-F0-9]{12}$")
+	return r.MatchString(fl.Field().String())
 }

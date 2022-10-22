@@ -23,12 +23,14 @@ func UsersController(ur interfaces.UserInterface) *UserServices {
 func (s *UserServices) List(c *fiber.Ctx) error {
 	page, _ := strconv.Atoi(c.Query("page", "1"))
 	perPage, _ := strconv.Atoi(c.Query("per_page", "10"))
+	search := c.Query("search", "")
 	order := c.Query("order", "id")
 
 	users, err := s.ur.List(pkg.Pagination{
 		Page:    page,
 		PerPage: perPage,
 		Order:   order,
+		Search:  search,
 	})
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{

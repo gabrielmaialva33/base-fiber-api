@@ -5,6 +5,7 @@ type Pagination struct {
 	Page       int         `json:"current_page,omitempty;query:page"`
 	PerPage    int         `json:"per_page,omitempty;query:per_page"`
 	Order      string      `json:"order,omitempty;query:order"`
+	Search     string      `json:"search,omitempty;query:search"`
 	TotalPages int         `json:"total_pages"`
 	Data       interface{} `json:"data"`
 }
@@ -32,4 +33,8 @@ func (p *Pagination) GetOrder() string {
 		return "id ASC"
 	}
 	return p.Order
+}
+
+func (p *Pagination) GetSearch() string {
+	return p.Search
 }
