@@ -14,13 +14,17 @@ type UserGorm struct {
 	db *gorm.DB
 }
 
-func (u UserGorm) List(pagination pkg.Pagination) (*pkg.Pagination, error) {
+func (u UserGorm) List(meta pkg.Meta) (*pkg.Pagination, error) {
 	var users models.Users
+	var fields = []string{"first_name", "last_name", "email", "user_name"}
+	var pagination pkg.Pagination
 
-	if err := u.db.Scopes(scopes.Paginate(users, &pagination, u.db)).Find(&users).Error; err != nil {
+	if err := u.db.Scopes(scopes.Paginate(users, fields, &meta, u.db)).Find(&users).Error; err != nil {
 		return nil, err
 	}
-	pagination.Data = users.PublicUsers()
+
+	pagination.SetMeta(meta)
+	pagination.SetData(users.PublicUsers())
 
 	return &pagination, nil
 }

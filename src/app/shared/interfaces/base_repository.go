@@ -5,7 +5,7 @@ import (
 )
 
 type BaseRepository[T interface{}] interface {
-	List(pagination pkg.Pagination) (*pkg.Pagination, error)
+	List(meta pkg.Meta) (*pkg.Pagination, error)
 	Get(id string) (*T, error)
 	Store(model *T) (*T, error)
 	Edit(model *T) (*T, error)

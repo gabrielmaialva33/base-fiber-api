@@ -10,8 +10,8 @@ type UserRepository struct {
 	ur interfaces.UserInterface
 }
 
-func (u UserRepository) List(pagination pkg.Pagination) (*pkg.Pagination, error) {
-	return u.ur.List(pagination)
+func (u UserRepository) List(meta pkg.Meta) (*pkg.Pagination, error) {
+	return u.ur.List(meta)
 }
 
 func (u UserRepository) Get(id string) (*models.User, error) {

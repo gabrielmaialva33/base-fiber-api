@@ -2,34 +2,31 @@ package scopes
 
 import (
 	"base-fiber-api/src/app/shared/pkg"
-	"fmt"
-	"github.com/fatih/structs"
 	"gorm.io/gorm"
 	"math"
-	"reflect"
 )
 
-func Paginate(model interface{}, pagination *pkg.Pagination, db *gorm.DB) func(db *gorm.DB) *gorm.DB {
+func Paginate(model interface{}, fields []string, meta *pkg.Meta, db *gorm.DB) func(db *gorm.DB) *gorm.DB {
+
 	var count int64
+	for _, field := range fields {
+		db = db.Or(field+" ilike ?", "%"+meta.GetSearch()+"%")
+	}
 
-	s := structs.Fields(model)
-	fmt.Println(s)
+	db.Model(model).Count(&count)
 
-	db.Model(model).Where("first_name ilike ?", "%"+pagination.GetSearch()+"%").Count(&count)
-
-	r := reflect.TypeOf(model).Elem().NumField()
-	fmt.Println(r)
-
-	pagination.Total = count
-	pagination.TotalPages = int(math.Ceil(float64(count) / float64(pagination.GetPerPage())))
-	pagination.Page = pagination.GetPage()
-	pagination.PerPage = pagination.GetPerPage()
-	pagination.Order = pagination.GetOrder()
-	pagination.Search = pagination.GetSearch()
+	meta.Total = count
+	meta.TotalPages = int(math.Ceil(float64(count) / float64(meta.GetPerPage())))
+	meta.CurrentPage = meta.GetCurrentPage()
+	meta.PerPage = meta.GetPerPage()
+	meta.Sort = meta.GetSort()
+	meta.Order = meta.GetOrder()
+	meta.Search = meta.GetSearch()
 
 	return func(db *gorm.DB) *gorm.DB {
-		return db.Offset(pagination.GetOffset()).Limit(pagination.GetPerPage()).
-			Where("first_name ilike ?", "%"+pagination.GetSearch()+"%").
-			Order(pagination.GetOrder())
+		for _, field := range fields {
+			db = db.Or(field+" ilike ?", "%"+meta.GetSearch()+"%")
+		}
+		return db.Offset(meta.GetOffset()).Limit(meta.GetPerPage()).Order(meta.GetSort())
 	}
 }
