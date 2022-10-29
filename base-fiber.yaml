@@ -10,13 +10,13 @@ info:
 servers:
   - url: http://127.0.0.1:3333
 paths:
-  /users/login:
+  /login:
     post:
       tags:
         - User
-      summary: Login user
+      summary: Login
       description: 'Login user into the system'
-      operationId: loginUser
+      operationId: LoginUser
       requestBody:
         required: true
         content:
@@ -54,14 +54,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UnprocessableEntity'
-
   /users:
     get:
       tags:
         - User
       summary: List users
       description: 'Get all users from the system'
-      operationId: listUsers
+      operationId: ListUsers
       parameters:
         - name: page
           in: query
@@ -70,31 +69,46 @@ paths:
           schema:
             type: integer
             format: int32
-        - name: per_pege
+            minimum: 1
+            maximum: 100
+            default: 1
+        - name: per_page
           in: query
           description: Number of users per page
           required: false
           schema:
             type: integer
             format: int32
+            default: 10
+            minimum: 1
         - name: search
           in: query
           description: Search by public user attributes
           required: false
           schema:
             type: string
+            default: 'first_name'
         - name: sort
           in: query
           description: Sort by public user attributes
           required: false
           schema:
             type: string
+            default: 'id'
+        - name: order
+          in: query
+          description: Order by public user attributes
+          required: false
+          schema:
+            type: string
+            default: 'asc'
       responses:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Users'
-
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListUsers'
 
 tags:
   - name: User
@@ -123,6 +137,7 @@ components:
           type: string
         password:
           type: string
+
     User:
       type: object
       properties:
@@ -137,7 +152,18 @@ components:
           type: string
         user_name:
           type: string
-    MetaPaginate:
+    ListUsers:
+      type: object
+      properties:
+        meta:
+          $ref: '#/components/schemas/Meta'
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/User'
+
+
+    Meta:
       type: object
       properties:
         total:
@@ -152,10 +178,20 @@ components:
         current_page:
           type: number
           format: int64
-        sort:
-          type: string
         search:
           type: string
+        sort:
+          type: string
+        order:
+          type: string
+      example:
+        total: 1
+        total_pages: 1
+        per_page: 10
+        current_page: 1
+        search: ''
+        sort: 'id'
+        order: 'asc'
 
     # Success responses
     LoginSuccess:

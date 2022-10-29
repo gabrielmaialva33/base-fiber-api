@@ -22,9 +22,12 @@ func (m *Meta) GetOffset() int {
 }
 
 func (m *Meta) GetPerPage() int {
-	if m.PerPage == 0 {
+	if m.PerPage == 0 || m.PerPage < 0 {
 		return 10
+	} else if m.PerPage > 100 {
+		return 100
 	}
+
 	return m.PerPage
 }
 

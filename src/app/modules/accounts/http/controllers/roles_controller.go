@@ -22,12 +22,14 @@ func RolesController(rr interfaces.RoleInterface) *RoleServices {
 func (r RoleServices) List(c *fiber.Ctx) error {
 	page, _ := strconv.Atoi(c.Query("page", "1"))
 	perPage, _ := strconv.Atoi(c.Query("per_page", "10"))
-	sort := c.Query("sort", "name")
+	search := c.Query("search", "")
+	sort := c.Query("sort", "id")
 	order := c.Query("order", "asc")
 
 	roles, err := r.rr.List(pkg.Meta{
 		CurrentPage: page,
 		PerPage:     perPage,
+		Search:      search,
 		Sort:        sort,
 		Order:       order,
 	})
