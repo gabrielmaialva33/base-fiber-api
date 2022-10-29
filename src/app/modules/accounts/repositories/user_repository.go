@@ -16,8 +16,9 @@ type UserGorm struct {
 
 func (u UserGorm) List(pagination pkg.Pagination) (*pkg.Pagination, error) {
 	var users models.Users
+	var fields = []string{"first_name", "last_name", "email", "user_name"}
 
-	if err := u.db.Scopes(scopes.Paginate(users, &pagination, u.db)).Find(&users).Error; err != nil {
+	if err := u.db.Scopes(scopes.Paginate(users, fields, &pagination, u.db)).Find(&users).Error; err != nil {
 		return nil, err
 	}
 	pagination.Data = users.PublicUsers()
