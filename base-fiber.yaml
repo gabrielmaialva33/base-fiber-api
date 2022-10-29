@@ -1,0 +1,244 @@
+openapi: 3.0.3
+info:
+  version: 1.0.0
+  title: Base Fiber API
+  description: 'This is a simple acl API built with Fiber'
+  contact:
+    name: Maia
+    email: 'gabrielmaialva33@gmail.com'
+    url: github.com/gabrielmaialva33
+servers:
+  - url: http://127.0.0.1:3333
+paths:
+  /users/login:
+    post:
+      tags:
+        - User
+      summary: Login
+      description: 'Login user into the system'
+      operationId: loginUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Login'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginSuccess'
+        '400':
+          description: Bad request response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        '401':
+          description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unauthorized'
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFound'
+        '422':
+          description: Unprocessable Entity
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnprocessableEntity'
+
+tags:
+  - name: User
+    description: Operations about user
+components:
+  securitySchemes:
+    bearer:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  responses:
+    '200':
+      description: OK
+    '401':
+      description: Unauthorized
+    '422':
+      description: Unprocessable Entity
+    '404':
+      description: Not Found
+  schemas:
+    # Entities
+    Login:
+      type: object
+      properties:
+        uid:
+          type: string
+        password:
+          type: string
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        first_name:
+          type: string
+        last_name:
+          type: string
+        email:
+          type: string
+        user_name:
+          type: string
+    MetaPaginate:
+      type: object
+      properties:
+        total:
+          type: number
+          format: int64
+        per_page:
+          type: number
+          format: int64
+        current_page:
+          type: number
+          format: int64
+        last_page:
+          type: number
+          format: int64
+        first_page:
+          type: number
+          format: int64
+        first_page_url:
+          type: string
+        last_page_url:
+          type: string
+        next_page_url:
+          type: string
+        previous_page_url:
+          type: string
+
+    # Success responses
+    LoginSuccess:
+      type: object
+      properties:
+        message:
+          type: string
+        status:
+          type: number
+          format: int64
+        display:
+          type: boolean
+        user:
+          $ref: '#/components/schemas/User'
+        token:
+          type: string
+      example:
+        display: false
+        message: Login successful
+        status: 200
+        token: token here
+        user:
+          id: 93d7ad22-87e0-41b4-8b90-745bd87fa9af
+          first_name: John
+          last_name: Doe
+          email: john@email.com
+          user_name: john
+
+    # Errors responses
+    NotFound:
+      type: object
+      properties:
+        message:
+          type: string
+        status:
+          type: number
+          format: int64
+        error:
+          type: string
+        display:
+          type: boolean
+      example:
+        message: "User not found"
+        status: 404
+        error: "record not found"
+        display: true
+    BadRequest:
+      type: object
+      properties:
+        message:
+          type: string
+        status:
+          type: number
+          format: int64
+        error:
+          type: string
+        display:
+          type: boolean
+      example:
+        message: "Error while parsing data"
+        status: 400
+        error: "invalid character '}' looking for beginning of object key string"
+        display: false
+    Unauthorized:
+      type: object
+      properties:
+        message:
+          type: string
+        status:
+          type: number
+          format: int64
+        display:
+          type: boolean
+      example:
+        message: "Invalid credentials"
+        status: 401
+        display: true
+    UnprocessableEntity:
+      type: object
+      properties:
+        message:
+          type: string
+        status:
+          type: number
+          format: int64
+        errors:
+          type: array
+          items:
+            type: object
+            properties:
+              failed_field:
+                type: string
+              tag:
+                type: string
+              field:
+                type: string
+              value:
+                type: string
+              param:
+                type: string
+              message:
+                type: string
+        display:
+          type: boolean
+      example:
+        message: "Validation failed"
+        status: 422
+        errors: [ {
+          "failed_field": "Login.Password",
+          "tag": "required",
+          "field": "password",
+          "value": "",
+          "param": "",
+          "message": "Password é um campo requerido"
+        } ]
+        display: true
+
+
+
+

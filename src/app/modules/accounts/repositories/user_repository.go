@@ -71,7 +71,7 @@ func (u UserGorm) FindManyBy(field []string, value string) (*models.User, error)
 			return &user, nil
 		}
 	}
-	return nil, errors.New("user not found")
+	return nil, errors.New("record not found")
 }
 
 func UserRepository(db *gorm.DB) *UserGorm {

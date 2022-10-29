@@ -189,13 +189,17 @@ func (s *UserServices) Login(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"message": "Error while parsing data",
 			"error":   err.Error(),
+			"status":  fiber.StatusBadRequest,
+			"display": false,
 		})
 	}
 
 	if errors := validators.ValidateStruct(data); len(errors) > 0 {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+		return c.Status(fiber.StatusUnprocessableEntity).JSON(fiber.Map{
 			"message": "Validation failed",
 			"errors":  errors,
+			"status":  fiber.StatusUnprocessableEntity,
+			"display": true,
 		})
 	}
 
@@ -203,15 +207,17 @@ func (s *UserServices) Login(c *fiber.Ctx) error {
 	if err != nil {
 		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
 			"message": "User not found",
+			"status":  fiber.StatusNotFound,
+			"display": true,
 			"error":   err.Error(),
 		})
 	}
 
-	match, err := pkg.ComparePasswordAndHash(data.Password, user.Password)
-	if err != nil || match == false {
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-			"message": "Error while comparing password",
-			"error":   err.Error(),
+	if match, _ := pkg.ComparePasswordAndHash(data.Password, user.Password); match == false {
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
+			"message": "Invalid credentials",
+			"status":  fiber.StatusUnauthorized,
+			"display": true,
 		})
 	}
 
@@ -220,11 +226,15 @@ func (s *UserServices) Login(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"message": "Error while generating token",
 			"error":   err.Error(),
+			"status":  fiber.StatusInternalServerError,
+			"display": false,
 		})
 	}
 
 	return c.JSON(fiber.Map{
 		"message": "Login successful",
+		"status":  fiber.StatusOK,
+		"display": false,
 		"user":    user.PublicUser(),
 		"token":   token,
 	})

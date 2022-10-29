@@ -5,6 +5,7 @@ import (
 	"base-fiber-api/src/app/modules/accounts/http/routes"
 	"base-fiber-api/src/database"
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/joho/godotenv"
 	"log"
@@ -29,6 +30,11 @@ func main() {
 		ProxyHeader:             fiber.HeaderXForwardedFor,
 	})
 
+	app.Use(cors.New(cors.Config{
+		AllowOrigins: "*",
+		AllowMethods: "GET,POST,PUT,DELETE,OPTIONS",
+		AllowHeaders: "Origin, Content-Type, Accept, Authorization, X-Request-With",
+	}))
 	app.Use(logger.New())
 
 	userController := controllers.UsersController(services.User)
