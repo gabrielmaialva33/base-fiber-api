@@ -14,14 +14,15 @@ type RoleGorm struct {
 	db *gorm.DB
 }
 
-func (r RoleGorm) List(pagination pkg.Pagination) (*pkg.Pagination, error) {
+func (r RoleGorm) List(meta pkg.Meta) (*pkg.Pagination, error) {
 	var roles models.Roles
 	var fields = []string{"name", "slug", "description"}
+	var pagination pkg.Pagination
 
-	if err := r.db.Scopes(scopes.Paginate(roles, fields, &pagination, r.db)).Find(&roles).Error; err != nil {
+	if err := r.db.Scopes(scopes.Paginate(roles, fields, &meta, r.db)).Find(&roles).Error; err != nil {
 		return nil, err
 	}
-	pagination.Data = roles.PublicRoles()
+	pagination.SetData(roles.PublicRoles())
 
 	return &pagination, nil
 }

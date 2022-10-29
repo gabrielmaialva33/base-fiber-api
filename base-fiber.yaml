@@ -57,14 +57,44 @@ paths:
 
   /users:
     get:
-        tags:
-            - User
-        summary: List users
-        description: 'Get all users'
-        operationId: listUsers
-        responses:
-            '200':
-              description: successful operation
+      tags:
+        - User
+      summary: List users
+      description: 'Get all users from the system'
+      operationId: listUsers
+      parameters:
+        - name: page
+          in: query
+          description: Page number
+          required: false
+          schema:
+            type: integer
+            format: int32
+        - name: per_pege
+          in: query
+          description: Number of users per page
+          required: false
+          schema:
+            type: integer
+            format: int32
+        - name: search
+          in: query
+          description: Search by public user attributes
+          required: false
+          schema:
+            type: string
+        - name: sort
+          in: query
+          description: Sort by public user attributes
+          required: false
+          schema:
+            type: string
+      responses:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Users'
+
 
 tags:
   - name: User
@@ -113,25 +143,18 @@ components:
         total:
           type: number
           format: int64
+        total_pages:
+          type: number
+          format: int64
         per_page:
           type: number
           format: int64
         current_page:
           type: number
           format: int64
-        last_page:
-          type: number
-          format: int64
-        first_page:
-          type: number
-          format: int64
-        first_page_url:
+        sort:
           type: string
-        last_page_url:
-          type: string
-        next_page_url:
-          type: string
-        previous_page_url:
+        search:
           type: string
 
     # Success responses

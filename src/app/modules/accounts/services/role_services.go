@@ -10,8 +10,8 @@ type RoleRepository struct {
 	rr interfaces.RoleInterface
 }
 
-func (r RoleRepository) List(pagination pkg.Pagination) (*pkg.Pagination, error) {
-	return r.rr.List(pagination)
+func (r RoleRepository) List(meta pkg.Meta) (*pkg.Pagination, error) {
+	return r.rr.List(meta)
 }
 
 func (r RoleRepository) Get(id string) (*models.Role, error) {

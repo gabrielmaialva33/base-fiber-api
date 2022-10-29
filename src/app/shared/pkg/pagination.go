@@ -1,40 +1,62 @@
 package pkg
 
+type Meta struct {
+	Total       int64  `json:"total"`
+	TotalPages  int    `json:"total_pages"`
+	PerPage     int    `json:"per_page,omitempty;query:per_page"`
+	CurrentPage int    `json:"current_page,omitempty;query:page"`
+	LastPage    int    `json:"last_page,omitempty"`
+	FistPage    int    `json:"first_page,omitempty"`
+	Search      string `json:"search,omitempty;query:search"`
+	Sort        string `json:"sort,omitempty;query:sort"`
+	Order       string `json:"order,omitempty;query:order"`
+}
+
 type Pagination struct {
-	Total      int64       `json:"total"`
-	Page       int         `json:"current_page,omitempty;query:page"`
-	PerPage    int         `json:"per_page,omitempty;query:per_page"`
-	Order      string      `json:"order,omitempty;query:order"`
-	Search     string      `json:"search,omitempty;query:search"`
-	TotalPages int         `json:"total_pages"`
-	Data       interface{} `json:"data"`
+	Meta Meta        `json:"meta"`
+	Data interface{} `json:"data"`
 }
 
-func (p *Pagination) GetOffset() int {
-	return (p.GetPage() - 1) * p.GetPerPage()
+func (m *Meta) GetOffset() int {
+	return (m.GetCurrentPage() - 1) * m.GetPerPage()
 }
 
-func (p *Pagination) GetPerPage() int {
-	if p.PerPage == 0 {
+func (m *Meta) GetPerPage() int {
+	if m.PerPage == 0 {
 		return 10
 	}
-	return p.PerPage
+	return m.PerPage
 }
 
-func (p *Pagination) GetPage() int {
-	if p.Page == 0 || p.Page < 0 {
+func (m *Meta) GetCurrentPage() int {
+	if m.CurrentPage == 0 || m.CurrentPage < 0 {
 		return 1
 	}
-	return p.Page
+	return m.CurrentPage
 }
 
-func (p *Pagination) GetOrder() string {
-	if p.Order == "" {
-		return "id ASC"
+func (m *Meta) GetSort() string {
+	if m.Sort == "" {
+		return "id" + m.GetOrder()
 	}
-	return p.Order
+	return m.Sort
 }
 
-func (p *Pagination) GetSearch() string {
-	return p.Search
+func (m *Meta) GetOrder() string {
+	if m.Order == "" {
+		return "ASC"
+	}
+	return m.Order
+}
+
+func (m *Meta) GetSearch() string {
+	return m.Search
+}
+
+func (p *Pagination) SetMeta(meta Meta) {
+	p.Meta = meta
+}
+
+func (p *Pagination) SetData(data interface{}) {
+	p.Data = data
 }
