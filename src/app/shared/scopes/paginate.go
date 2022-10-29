@@ -19,7 +19,7 @@ func Paginate(model interface{}, fields []string, meta *pkg.Meta, db *gorm.DB) f
 	meta.TotalPages = int(math.Ceil(float64(count) / float64(meta.GetPerPage())))
 	meta.CurrentPage = meta.GetCurrentPage()
 	meta.PerPage = meta.GetPerPage()
-	meta.Sort = meta.GetSort()
+	meta.Sort = meta.GetSort(fields)
 	meta.Order = meta.GetOrder()
 	meta.Search = meta.GetSearch()
 
@@ -27,6 +27,6 @@ func Paginate(model interface{}, fields []string, meta *pkg.Meta, db *gorm.DB) f
 		for _, field := range fields {
 			db = db.Or(field+" ilike ?", "%"+meta.GetSearch()+"%")
 		}
-		return db.Offset(meta.GetOffset()).Limit(meta.GetPerPage()).Order(meta.GetSort())
+		return db.Offset(meta.GetOffset()).Limit(meta.GetPerPage()).Order(meta.GetSort(fields))
 	}
 }

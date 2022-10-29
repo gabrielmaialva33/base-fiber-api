@@ -1,5 +1,10 @@
 package pkg
 
+import (
+	"base-fiber-api/src/app/shared/utils"
+	"strings"
+)
+
 type Meta struct {
 	Total       int64  `json:"total"`
 	TotalPages  int    `json:"total_pages"`
@@ -38,18 +43,32 @@ func (m *Meta) GetCurrentPage() int {
 	return m.CurrentPage
 }
 
-func (m *Meta) GetSort() string {
+func (m *Meta) GetSort(fields []string) string {
 	if m.Sort == "" {
-		return "id" + m.GetOrder()
+		return "id" + " " + m.GetOrder()
 	}
-	return m.Sort
+
+	if utils.Contains(fields, m.Sort) != true {
+		return "id" + " " + m.GetOrder()
+	}
+
+	return strings.ToLower(m.Sort) + " " + m.GetOrder()
 }
 
 func (m *Meta) GetOrder() string {
+	orders := []string{"asc", "desc"}
+
 	if m.Order == "" {
 		return "ASC"
 	}
-	return m.Order
+
+	for _, order := range orders {
+		if strings.ToLower(m.Order) == order {
+			return strings.ToUpper(order)
+		}
+	}
+
+	return "ASC"
 }
 
 func (m *Meta) GetSearch() string {

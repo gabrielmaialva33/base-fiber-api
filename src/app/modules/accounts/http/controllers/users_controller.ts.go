@@ -38,6 +38,8 @@ func (s *UserServices) List(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"message": "Error while getting users",
 			"error":   err.Error(),
+			"status":  fiber.StatusBadRequest,
+			"display": true,
 		})
 	}
 
