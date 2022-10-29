@@ -229,14 +229,13 @@ components:
       example:
         message: "Validation failed"
         status: 422
-        errors: [ {
-          "failed_field": "Login.Password",
-          "tag": "required",
-          "field": "password",
-          "value": "",
-          "param": "",
-          "message": "Password é um campo requerido"
-        } ]
+        errors:
+          - failed_field: "email"
+            tag: "email"
+            field: "email"
+            value: "john@email"
+            param: ""
+            message: "email must be a valid email"
         display: true
 
 
