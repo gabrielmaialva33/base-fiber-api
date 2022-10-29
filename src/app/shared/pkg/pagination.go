@@ -62,13 +62,11 @@ func (m *Meta) GetOrder() string {
 		return "ASC"
 	}
 
-	for _, order := range orders {
-		if strings.ToLower(m.Order) == order {
-			return strings.ToUpper(order)
-		}
+	if utils.Contains(orders, strings.ToLower(m.Order)) != true {
+		return "ASC"
 	}
 
-	return "ASC"
+	return strings.ToUpper(m.Order)
 }
 
 func (m *Meta) GetSearch() string {

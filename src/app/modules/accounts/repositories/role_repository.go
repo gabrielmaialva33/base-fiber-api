@@ -22,6 +22,8 @@ func (r RoleGorm) List(meta pkg.Meta) (*pkg.Pagination, error) {
 	if err := r.db.Scopes(scopes.Paginate(roles, fields, &meta, r.db)).Find(&roles).Error; err != nil {
 		return nil, err
 	}
+
+	pagination.SetMeta(meta)
 	pagination.SetData(roles.PublicRoles())
 
 	return &pagination, nil
