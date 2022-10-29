@@ -1,9 +1,9 @@
-_id: req_wrk_5d8c9c3d005b473ab3df847c4db4c09a00ac9da2
+_id: req_wrk_5d8c9c3d005b473ab3df847c4db4c09ad63c37dc
 type: Request
 parentId: fld_wrk_5d8c9c3d005b473ab3df847c4db4c09a9f8a2389
-modified: 1667037015286
-created: 1667033035534
-url: "{{ base_url }}/users/login"
+modified: 1667050443662
+created: 1667050442505
+url: "{{ base_url }}/login"
 name: Login
 description: ""
 method: POST
@@ -11,16 +11,15 @@ body:
   mimeType: application/json
   text: |-
     {
-      "uid": "root",
-      "password": "123456"
+      "uid": "string",
+      "password": "string"
     }
 parameters: []
 headers:
   - name: Content-Type
     value: application/json
-    id: pair_fcc43efb7708434eab8f0aad31489341
 authentication: {}
-metaSortKey: -1667033035534
+metaSortKey: -1667050442505
 isPrivate: false
 settingStoreCookies: true
 settingSendCookies: true
