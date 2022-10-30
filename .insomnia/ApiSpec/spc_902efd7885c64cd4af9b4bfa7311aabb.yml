@@ -1,10 +1,10 @@
 _id: spc_902efd7885c64cd4af9b4bfa7311aabb
 type: ApiSpec
 parentId: wrk_5d8c9c3d005b473ab3df847c4db4c09a
-modified: 1667100047907
+modified: 1667100746978
 created: 1667029706091
 fileName: base-fiber-api
-contents: >
+contents: >+
   openapi: 3.0.3
 
   info:
@@ -192,7 +192,7 @@ contents: >
               application/json:
                 schema:
                   $ref: '#/components/schemas/UnprocessableEntity'
-    /users/{id}:
+    /users/{userId}:
       get:
         tags:
           - User
@@ -202,7 +202,7 @@ contents: >
         security:
           - bearerToken: [ ]
         parameters:
-          - name: id
+          - name: userId
             in: path
             description: User id
             required: true
@@ -237,7 +237,7 @@ contents: >
         security:
           - bearerToken: [ ]
         parameters:
-          - name: id
+          - name: userId
             in: path
             description: User id
             required: true
@@ -284,7 +284,7 @@ contents: >
         security:
           - bearerToken: [ ]
         parameters:
-          - name: id
+          - name: userId
             in: path
             description: User id
             required: true
@@ -403,7 +403,7 @@ contents: >
               application/json:
                 schema:
                   $ref: '#/components/schemas/UnprocessableEntity'
-    /roles/{id}:
+    /roles/{roleId}:
       get:
         tags:
           - Role
@@ -413,7 +413,7 @@ contents: >
         security:
           - bearerToken: [ ]
         parameters:
-          - name: id
+          - name: roleId
             in: path
             description: Role id
             required: true
@@ -448,7 +448,7 @@ contents: >
         security:
           - bearerToken: [ ]
         parameters:
-          - name: id
+          - name: roleId
             in: path
             description: Role id
             required: true
@@ -495,7 +495,7 @@ contents: >
         security:
           - bearerToken: [ ]
         parameters:
-          - name: id
+          - name: roleId
             in: path
             description: Role id
             required: true
@@ -820,4 +820,7 @@ contents: >
               param: ""
               message: "email must be a valid email"
           display: true
+
+
+
 contentType: yaml
