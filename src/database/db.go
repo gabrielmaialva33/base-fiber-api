@@ -47,16 +47,24 @@ func (r Repositories) Drop() {
 func (r Repositories) Seed() {
 	roles := []models.Role{
 		{
-			Name: "root",
-			Slug: "Root",
+			Name:        "root",
+			Slug:        "Root",
+			Description: "A root user has all permissions",
 		},
 		{
-			Name: "admin",
-			Slug: "Admin",
+			Name:        "admin",
+			Slug:        "Admin",
+			Description: "An admin user has all permissions except root",
 		},
 		{
-			Name: "user",
-			Slug: "User",
+			Name:        "user",
+			Slug:        "User",
+			Description: "A user has limited permissions",
+		},
+		{
+			Name:        "guest",
+			Slug:        "Guest",
+			Description: "A guest user has no permissions",
 		},
 	}
 	users := []models.User{
