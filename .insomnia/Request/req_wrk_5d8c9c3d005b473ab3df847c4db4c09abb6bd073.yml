@@ -1,8 +1,8 @@
 _id: req_wrk_5d8c9c3d005b473ab3df847c4db4c09abb6bd073
 type: Request
 parentId: fld_wrk_5d8c9c3d005b473ab3df847c4db4c09a9f8a2389
-modified: 1667050448325
-created: 1667050442504
+modified: 1667098405210
+created: 1667098405210
 url: "{{ base_url }}/users"
 name: List users
 description: ""
@@ -12,26 +12,24 @@ parameters:
   - name: page
     disabled: true
     value: "1"
-    id: pair_6a34f6c1543447639ad5c6235f1eb1fa
   - name: per_page
     disabled: true
     value: "10"
-    id: pair_72a90def2e0246b1adb1d24ce60067c1
   - name: search
     disabled: true
     value: first_name
-    id: pair_90300619684842808bd585af45ad30bb
   - name: sort
     disabled: true
     value: id
-    id: pair_4744f673dc4a41f2af3ad7988324093a
   - name: order
     disabled: true
     value: asc
-    id: pair_7f8a971038854bb2a818383aee57a69b
 headers: []
-authentication: {}
-metaSortKey: -1667050442504
+authentication:
+  type: bearer
+  token: "{{bearerToken}}"
+  prefix: ""
+metaSortKey: -1667098405210
 isPrivate: false
 settingStoreCookies: true
 settingSendCookies: true
