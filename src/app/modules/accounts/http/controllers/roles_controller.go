@@ -37,6 +37,8 @@ func (r RoleServices) List(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"message": "Error while getting roles",
 			"error":   err.Error(),
+			"status":  fiber.StatusBadRequest,
+			"display": true,
 		})
 	}
 
@@ -49,6 +51,8 @@ func (r RoleServices) Get(c *fiber.Ctx) error {
 	if validators.ValidateUUID(uuid) == false {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"message": "Invalid UUID",
+			"status":  fiber.StatusBadRequest,
+			"display": false,
 		})
 	}
 
@@ -57,6 +61,8 @@ func (r RoleServices) Get(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
 			"message": "Role not found",
 			"error":   err.Error(),
+			"status":  fiber.StatusNotFound,
+			"display": true,
 		})
 	}
 
@@ -69,6 +75,8 @@ func (r RoleServices) Store(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"message": "Error while parsing body",
 			"error":   err.Error(),
+			"status":  fiber.StatusBadRequest,
+			"display": true,
 		})
 	}
 
@@ -79,13 +87,17 @@ func (r RoleServices) Store(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"message": "Error while merging data",
 			"error":   err.Error(),
+			"status":  fiber.StatusInternalServerError,
+			"display": true,
 		})
 	}
 
 	if errors := validators.ValidateStruct(role); len(errors) > 0 {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+		return c.Status(fiber.StatusUnprocessableEntity).JSON(fiber.Map{
 			"message": "Validation failed",
 			"errors":  errors,
+			"status":  fiber.StatusUnprocessableEntity,
+			"display": true,
 		})
 	}
 
@@ -94,6 +106,8 @@ func (r RoleServices) Store(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"message": "Error while creating role",
 			"error":   err.Error(),
+			"status":  fiber.StatusBadRequest,
+			"display": false,
 		})
 	}
 
@@ -105,6 +119,8 @@ func (r RoleServices) Edit(c *fiber.Ctx) error {
 	if validators.ValidateUUID(uuid) == false {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"message": "Invalid UUID",
+			"status":  fiber.StatusBadRequest,
+			"display": false,
 		})
 	}
 
@@ -113,6 +129,8 @@ func (r RoleServices) Edit(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"message": "Error while parsing data",
 			"error":   err.Error(),
+			"status":  fiber.StatusBadRequest,
+			"display": true,
 		})
 	}
 
@@ -121,6 +139,8 @@ func (r RoleServices) Edit(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
 			"message": "Role not found",
 			"error":   err.Error(),
+			"status":  fiber.StatusNotFound,
+			"display": true,
 		})
 	}
 
@@ -132,13 +152,17 @@ func (r RoleServices) Edit(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"message": "Error while merging data",
 			"error":   err.Error(),
+			"status":  fiber.StatusInternalServerError,
+			"display": false,
 		})
 	}
 
 	if errors := validators.ValidatePartialStruct(emptyRole); len(errors) > 0 {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+		return c.Status(fiber.StatusUnprocessableEntity).JSON(fiber.Map{
 			"message": "Validation failed",
 			"errors":  errors,
+			"status":  fiber.StatusUnprocessableEntity,
+			"display": true,
 		})
 	}
 
@@ -147,6 +171,8 @@ func (r RoleServices) Edit(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"message": "Error while updating user",
 			"error":   err.Error(),
+			"status":  fiber.StatusInternalServerError,
+			"display": false,
 		})
 	}
 
@@ -158,6 +184,8 @@ func (r RoleServices) Delete(c *fiber.Ctx) error {
 	if validators.ValidateUUID(uuid) == false {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"message": "Invalid UUID",
+			"status":  fiber.StatusBadRequest,
+			"display": false,
 		})
 	}
 
@@ -166,6 +194,8 @@ func (r RoleServices) Delete(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
 			"message": "User not found",
 			"error":   err.Error(),
+			"status":  fiber.StatusNotFound,
+			"display": true,
 		})
 	}
 
@@ -179,10 +209,12 @@ func (r RoleServices) Delete(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"message": "Error while deleting user",
 			"error":   err.Error(),
+			"status":  fiber.StatusInternalServerError,
+			"display": false,
 		})
 	}
 
-	return c.JSON(fiber.Map{
+	return c.Status(fiber.StatusNoContent).JSON(fiber.Map{
 		"message": "Role deleted",
 	})
 }
