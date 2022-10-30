@@ -47,7 +47,7 @@ func (s *UserServices) List(c *fiber.Ctx) error {
 }
 
 func (s *UserServices) Get(c *fiber.Ctx) error {
-	uuid := c.Params("id")
+	uuid := c.Params("userId")
 
 	if validators.ValidateUUID(uuid) == false {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
@@ -102,7 +102,7 @@ func (s *UserServices) Store(c *fiber.Ctx) error {
 }
 
 func (s *UserServices) Edit(c *fiber.Ctx) error {
-	uuid := c.Params("id")
+	uuid := c.Params("userId")
 	if validators.ValidateUUID(uuid) == false {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"message": "Invalid UUID",
@@ -154,7 +154,7 @@ func (s *UserServices) Edit(c *fiber.Ctx) error {
 }
 
 func (s *UserServices) Delete(c *fiber.Ctx) error {
-	uuid := c.Params("id")
+	uuid := c.Params("userId")
 	if validators.ValidateUUID(uuid) == false {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"message": "Invalid UUID",

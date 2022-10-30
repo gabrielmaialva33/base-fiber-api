@@ -12,8 +12,8 @@ func RoleRoutes(app *fiber.App, controller *controllers.RoleServices) {
 	api.Use(middlewares.Auth)
 
 	api.Get("/", controller.List).Name("roles.list")
-	api.Get("/:id", controller.Get).Name("roles.get")
+	api.Get("/:roleId", controller.Get).Name("roles.get")
 	api.Post("/", controller.Store).Name("roles.store")
-	api.Put("/:id", controller.Edit).Name("roles.edit")
-	api.Delete("/:id", controller.Delete).Name("roles.delete")
+	api.Put("/:roleId", controller.Edit).Name("roles.edit")
+	api.Delete("/:roleId", controller.Delete).Name("roles.delete")
 }
