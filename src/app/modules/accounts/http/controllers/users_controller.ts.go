@@ -182,7 +182,7 @@ func (s *UserServices) Delete(c *fiber.Ctx) error {
 		})
 	}
 
-	return c.JSON(fiber.Map{
+	return c.Status(fiber.StatusNoContent).JSON(fiber.Map{
 		"message": "User deleted",
 	})
 }

@@ -13,7 +13,7 @@ paths:
   /signin:
     post:
       tags:
-        - User
+        - Auth
       summary: Sign In
       description: 'Sign in user into the system'
       operationId: SignInUser
@@ -54,10 +54,11 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UnprocessableEntity'
+
   /signup:
     post:
       tags:
-        - User
+        - Auth
       summary: SignUp
       description: 'Sign up user into the system'
       operationId: SignUpUser
@@ -95,6 +96,8 @@ paths:
       summary: List users
       description: 'Get all users from the system'
       operationId: ListUsers
+      security:
+        - bearerToken: [ ]
       parameters:
         - name: page
           in: query
@@ -155,6 +158,8 @@ paths:
       summary: Store user
       description: 'Store user into the system'
       operationId: StoreUser
+      security:
+        - bearerToken: [ ]
       requestBody:
         required: true
         content:
@@ -187,6 +192,8 @@ paths:
       summary: Get user
       description: 'Get user by id'
       operationId: GetUser
+      security:
+        - bearerToken: [ ]
       parameters:
         - name: id
           in: path
@@ -215,57 +222,92 @@ paths:
               schema:
                 $ref: '#/components/schemas/NotFound'
     put:
-        tags:
-          - User
-        summary: Edit user
-        description: 'Edit user by id'
-        operationId: EditUser
-        parameters:
-            - name: id
-              in: path
-              description: User id
-              required: true
-              schema:
-                type: string
-                format: uuid
-        requestBody:
+      tags:
+        - User
+      summary: Edit user
+      description: 'Edit user by id'
+      operationId: EditUser
+      security:
+        - bearerToken: [ ]
+      parameters:
+        - name: id
+          in: path
+          description: User id
           required: true
-          content:
-           application/json:
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
             schema:
-             $ref: '#/components/schemas/PublicUser'
-        responses:
-            '200':
-              description: successful operation
-              content:
-                application/json:
-                  schema:
-                    $ref: '#/components/schemas/PublicUser'
-            '400':
-              description: Bad request response
-              content:
-                application/json:
-                  schema:
-                    $ref: '#/components/schemas/BadRequest'
-            '404':
-              description: User not found
-              content:
-                application/json:
-                  schema:
-                    $ref: '#/components/schemas/NotFound'
-            '422':
-              description: Unprocessable Entity
-              content:
-                application/json:
-                  schema:
-                    $ref: '#/components/schemas/UnprocessableEntity'
+              $ref: '#/components/schemas/EditUser'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PublicUser'
+        '400':
+          description: Bad request response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFound'
+        '422':
+          description: Unprocessable Entity
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnprocessableEntity'
+    delete:
+      tags:
+        - User
+      summary: Delete user
+      description: 'Delete user by id'
+      operationId: DeleteUser
+      security:
+        - bearerToken: [ ]
+      parameters:
+        - name: id
+          in: path
+          description: User id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: successful operation
+        '400':
+          description: Bad request response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFound'
 
 tags:
+  - name: Auth
+    description: Operations about auth
   - name: User
     description: Operations about user
 components:
   securitySchemes:
-    bearer:
+    bearerToken:
       type: http
       scheme: bearer
       bearerFormat: JWT
@@ -294,6 +336,12 @@ components:
           type: string
         user_name:
           type: string
+      example:
+        id: 'bd7661b5-6ea6-49cc-abd8-49f110f4de27'
+        first_name: John
+        last_name: Doe
+        email: john@email.com
+        user_name: john
 
     # Request Body Schemas
     SignIn:
@@ -321,13 +369,36 @@ components:
           type: string
         confirm_password:
           type: string
+      required:
+        - first_name
+        - last_name
+        - email
+        - user_name
+        - password
+        - confirm_password
       example:
         first_name: John
         last_name: Doe
         email: john@email.com
         user_name: john
-        password: password
-        confirm_password: password
+        password: john1234
+        confirm_password: john1234
+    EditUser:
+      type: object
+      properties:
+        first_name:
+          type: string
+        last_name:
+          type: string
+        email:
+          type: string
+        user_name:
+          type: string
+      example:
+        first_name: John
+        last_name: Doe
+        email: john_doe@email.com
+        user_name: john_doe
 
     # Responses Schemas
     Meta:
@@ -484,7 +555,6 @@ components:
             param: ""
             message: "email must be a valid email"
         display: true
-
 
 
 
