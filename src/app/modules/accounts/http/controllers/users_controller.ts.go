@@ -250,6 +250,8 @@ func (s *UserServices) SignUp(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"message": "Error while parsing data",
 			"error":   err.Error(),
+			"status":  fiber.StatusBadRequest,
+			"display": false,
 		})
 	}
 
@@ -258,13 +260,17 @@ func (s *UserServices) SignUp(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"message": "Error while merging data",
 			"error":   err.Error(),
+			"status":  fiber.StatusInternalServerError,
+			"display": false,
 		})
 	}
 
 	if errors := validators.ValidateStruct(user); len(errors) > 0 {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+		return c.Status(fiber.StatusUnprocessableEntity).JSON(fiber.Map{
 			"message": "Validation failed",
 			"errors":  errors,
+			"status":  fiber.StatusUnprocessableEntity,
+			"display": true,
 		})
 	}
 
@@ -273,6 +279,8 @@ func (s *UserServices) SignUp(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"message": "Error while creating user",
 			"error":   err.Error(),
+			"status":  fiber.StatusInternalServerError,
+			"display": false,
 		})
 	}
 

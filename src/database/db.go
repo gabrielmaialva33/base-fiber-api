@@ -36,37 +36,16 @@ func NewRepositories(dsn string) *Repositories {
 
 func (r Repositories) Migrate() {
 	r.db.Exec("CREATE EXTENSION IF NOT EXISTS \"uuid-ossp\";")
-	r.db.AutoMigrate(&models.User{}, &models.Role{})
+	r.db.AutoMigrate(&models.User{}, &models.Role{}, &models.UserRole{})
+	r.db.SetupJoinTable(&models.User{}, "Roles", &models.UserRole{})
 }
 
 func (r Repositories) Drop() {
-	r.db.Exec("DROP EXTENSION IF EXISTS \"uuid-ossp\";")
-	r.db.Migrator().DropTable(&models.User{}, &models.Role{})
+	r.db.Exec("DROP EXTENSION IF EXISTS \"uuid-ossp\" CASCADE;")
+	r.db.Migrator().DropTable(&models.User{}, &models.Role{}, &models.UserRole{})
 }
 
 func (r Repositories) Seed() {
-	roles := []models.Role{
-		{
-			Name:        "root",
-			Slug:        "Root",
-			Description: "A root user has all permissions",
-		},
-		{
-			Name:        "admin",
-			Slug:        "Admin",
-			Description: "An admin user has all permissions except root",
-		},
-		{
-			Name:        "user",
-			Slug:        "User",
-			Description: "A user has limited permissions",
-		},
-		{
-			Name:        "guest",
-			Slug:        "Guest",
-			Description: "A guest user has no permissions",
-		},
-	}
 	users := []models.User{
 		{
 			FirstName: "Root",
@@ -74,6 +53,11 @@ func (r Repositories) Seed() {
 			Email:     "root@go.com",
 			UserName:  "root",
 			Password:  "123456",
+			Roles: []models.Role{{
+				Name:        "root",
+				Slug:        "Root",
+				Description: "A root user has all permissions",
+			}},
 		},
 		{
 			FirstName: "Admin",
@@ -81,6 +65,11 @@ func (r Repositories) Seed() {
 			Email:     "admin@go.com",
 			UserName:  "admin",
 			Password:  "123456",
+			Roles: []models.Role{{
+				Name:        "admin",
+				Slug:        "Admin",
+				Description: "An admin user has all permissions except root",
+			}},
 		},
 		{
 			FirstName: "Gabriel",
@@ -88,9 +77,25 @@ func (r Repositories) Seed() {
 			Email:     "maia@go.com",
 			UserName:  "maia",
 			Password:  "123456",
+			Roles: []models.Role{{
+				Name:        "user",
+				Slug:        "User",
+				Description: "A user has limited permissions",
+			}},
+		},
+		{
+			FirstName: "Guest",
+			LastName:  "System",
+			Email:     "guest@go.com",
+			UserName:  "guest",
+			Password:  "123456",
+			Roles: []models.Role{{
+				Name:        "guest",
+				Slug:        "Guest",
+				Description: "A guest user has no permissions",
+			}},
 		},
 	}
 
-	r.db.Create(&roles)
 	r.db.Create(&users)
 }

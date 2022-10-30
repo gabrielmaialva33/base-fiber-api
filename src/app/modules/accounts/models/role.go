@@ -16,10 +16,9 @@ type Role struct {
 	UpdatedAt   time.Time      `gorm:"column:updated_at;not null;default:CURRENT_TIMESTAMP" json:"-"`
 	DeletedAt   gorm.DeletedAt `gorm:"column:deleted_at;index,default:null" json:"-"`
 
-	// Relations
-	Users []*User `gorm:"many2many:user_roles;" json:"users"`
+	// Relationships
+	Users Users `gorm:"many2many:user_roles;" json:"users"`
 }
-
 type Roles []Role
 
 type RolePublic struct {

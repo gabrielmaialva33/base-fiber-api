@@ -20,20 +20,23 @@ func main() {
 
 	dsn := os.Getenv("DATABASE_URL")
 	services := database.NewRepositories(dsn)
+
 	services.Drop()
 	services.Migrate()
 	services.Seed()
 
 	app := fiber.New(fiber.Config{
+		AppName:                 "Base Fiber API",
 		EnableTrustedProxyCheck: true,
 		TrustedProxies:          []string{"0.0.0.0"},
 		ProxyHeader:             fiber.HeaderXForwardedFor,
 	})
 
 	app.Use(cors.New(cors.Config{
-		AllowOrigins: "*",
-		AllowMethods: "GET,POST,PUT,DELETE,OPTIONS",
-		AllowHeaders: "Origin, Content-Type, Accept, Authorization, X-Request-With",
+		AllowOrigins:     "*",
+		AllowMethods:     "GET,POST,PUT,DELETE,OPTIONS",
+		AllowHeaders:     "Origin, Content-Type, Accept, Authorization, X-Request-With",
+		AllowCredentials: true,
 	}))
 	app.Use(logger.New())
 
