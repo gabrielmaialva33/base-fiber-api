@@ -44,7 +44,7 @@ func (r RoleServices) List(c *fiber.Ctx) error {
 }
 
 func (r RoleServices) Get(c *fiber.Ctx) error {
-	uuid := c.Params("id")
+	uuid := c.Params("roleId")
 
 	if validators.ValidateUUID(uuid) == false {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
@@ -101,7 +101,7 @@ func (r RoleServices) Store(c *fiber.Ctx) error {
 }
 
 func (r RoleServices) Edit(c *fiber.Ctx) error {
-	uuid := c.Params("id")
+	uuid := c.Params("roleId")
 	if validators.ValidateUUID(uuid) == false {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"message": "Invalid UUID",
@@ -154,7 +154,7 @@ func (r RoleServices) Edit(c *fiber.Ctx) error {
 }
 
 func (r RoleServices) Delete(c *fiber.Ctx) error {
-	uuid := c.Params("id")
+	uuid := c.Params("roleId")
 	if validators.ValidateUUID(uuid) == false {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"message": "Invalid UUID",

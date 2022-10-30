@@ -184,7 +184,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UnprocessableEntity'
-  /users/{id}:
+  /users/{userId}:
     get:
       tags:
         - User
@@ -194,7 +194,7 @@ paths:
       security:
         - bearerToken: [ ]
       parameters:
-        - name: id
+        - name: userId
           in: path
           description: User id
           required: true
@@ -229,7 +229,7 @@ paths:
       security:
         - bearerToken: [ ]
       parameters:
-        - name: id
+        - name: userId
           in: path
           description: User id
           required: true
@@ -276,7 +276,7 @@ paths:
       security:
         - bearerToken: [ ]
       parameters:
-        - name: id
+        - name: userId
           in: path
           description: User id
           required: true
@@ -395,7 +395,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UnprocessableEntity'
-  /roles/{id}:
+  /roles/{roleId}:
     get:
       tags:
         - Role
@@ -405,7 +405,7 @@ paths:
       security:
         - bearerToken: [ ]
       parameters:
-        - name: id
+        - name: roleId
           in: path
           description: Role id
           required: true
@@ -440,7 +440,7 @@ paths:
       security:
         - bearerToken: [ ]
       parameters:
-        - name: id
+        - name: roleId
           in: path
           description: Role id
           required: true
@@ -487,7 +487,7 @@ paths:
       security:
         - bearerToken: [ ]
       parameters:
-        - name: id
+        - name: roleId
           in: path
           description: Role id
           required: true
