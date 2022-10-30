@@ -19,3 +19,11 @@ func Underscore(s string) string {
 	}
 	return strings.ToLower(strings.Join(a, "_"))
 }
+func Contains(s []string, e string) bool {
+	for _, a := range s {
+		if strings.ToLower(a) == strings.ToLower(e) {
+			return true
+		}
+	}
+	return false
+}

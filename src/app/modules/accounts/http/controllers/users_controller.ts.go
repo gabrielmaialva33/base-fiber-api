@@ -38,6 +38,8 @@ func (s *UserServices) List(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"message": "Error while getting users",
 			"error":   err.Error(),
+			"status":  fiber.StatusBadRequest,
+			"display": true,
 		})
 	}
 
@@ -180,12 +182,12 @@ func (s *UserServices) Delete(c *fiber.Ctx) error {
 		})
 	}
 
-	return c.JSON(fiber.Map{
+	return c.Status(fiber.StatusNoContent).JSON(fiber.Map{
 		"message": "User deleted",
 	})
 }
 
-func (s *UserServices) Login(c *fiber.Ctx) error {
+func (s *UserServices) SignIn(c *fiber.Ctx) error {
 	data := models.Login{}
 	if err := c.BodyParser(&data); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
@@ -238,6 +240,57 @@ func (s *UserServices) Login(c *fiber.Ctx) error {
 		"status":  fiber.StatusOK,
 		"display": false,
 		"user":    user.PublicUser(),
+		"token":   token,
+	})
+}
+
+func (s *UserServices) SignUp(c *fiber.Ctx) error {
+	data := models.User{}
+	if err := c.BodyParser(&data); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"message": "Error while parsing data",
+			"error":   err.Error(),
+		})
+	}
+
+	user := models.User{}
+	if err := mergo.Merge(&user, data); err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"message": "Error while merging data",
+			"error":   err.Error(),
+		})
+	}
+
+	if errors := validators.ValidateStruct(user); len(errors) > 0 {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"message": "Validation failed",
+			"errors":  errors,
+		})
+	}
+
+	newUser, err := s.ur.Store(&user)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"message": "Error while creating user",
+			"error":   err.Error(),
+		})
+	}
+
+	token, err := utils.GenerateJwt(newUser.Id)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"message": "Error while generating token",
+			"error":   err.Error(),
+			"status":  fiber.StatusInternalServerError,
+			"display": false,
+		})
+	}
+
+	return c.JSON(fiber.Map{
+		"message": "SignUp successful. Please login to continue",
+		"status":  fiber.StatusOK,
+		"display": false,
+		"user":    newUser.PublicUser(),
 		"token":   token,
 	})
 }

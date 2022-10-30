@@ -5,31 +5,31 @@ info:
   description: 'This is a simple acl API built with Fiber'
   contact:
     name: Maia
-    email: 'gabrielmaialva33@gmail.com'
+    email: gabrielmaialva33@gmail.com
     url: github.com/gabrielmaialva33
 servers:
   - url: http://127.0.0.1:3333
 paths:
-  /login:
+  /signin:
     post:
       tags:
-        - User
-      summary: Login
-      description: 'Login user into the system'
-      operationId: LoginUser
+        - Auth
+      summary: Sign In
+      description: 'Sign in user into the system'
+      operationId: SignInUser
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Login'
+              $ref: '#/components/schemas/SignIn'
       responses:
         '200':
           description: successful operation
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/LoginSuccess'
+                $ref: '#/components/schemas/SignInSuccess'
         '400':
           description: Bad request response
           content:
@@ -54,6 +54,41 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UnprocessableEntity'
+
+  /signup:
+    post:
+      tags:
+        - Auth
+      summary: SignUp
+      description: 'Sign up user into the system'
+      operationId: SignUpUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SignUp'
+      responses:
+        '201':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SignInSuccess'
+        '400':
+          description: Bad request response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        '422':
+          description: Unprocessable Entity
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnprocessableEntity'
+
+  # authorization routes
   /users:
     get:
       tags:
@@ -61,6 +96,8 @@ paths:
       summary: List users
       description: 'Get all users from the system'
       operationId: ListUsers
+      security:
+        - bearerToken: [ ]
       parameters:
         - name: page
           in: query
@@ -109,13 +146,168 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ListUsers'
+        '400':
+          description: Bad request response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+    post:
+      tags:
+        - User
+      summary: Store user
+      description: 'Store user into the system'
+      operationId: StoreUser
+      security:
+        - bearerToken: [ ]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SignUp'
+      responses:
+        '201':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PublicUser'
+        '400':
+          description: Bad request response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        '422':
+          description: Unprocessable Entity
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnprocessableEntity'
+  /users/{id}:
+    get:
+      tags:
+        - User
+      summary: Get user
+      description: 'Get user by id'
+      operationId: GetUser
+      security:
+        - bearerToken: [ ]
+      parameters:
+        - name: id
+          in: path
+          description: User id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PublicUser'
+        '400':
+          description: Bad request response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFound'
+    put:
+      tags:
+        - User
+      summary: Edit user
+      description: 'Edit user by id'
+      operationId: EditUser
+      security:
+        - bearerToken: [ ]
+      parameters:
+        - name: id
+          in: path
+          description: User id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EditUser'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PublicUser'
+        '400':
+          description: Bad request response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFound'
+        '422':
+          description: Unprocessable Entity
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnprocessableEntity'
+    delete:
+      tags:
+        - User
+      summary: Delete user
+      description: 'Delete user by id'
+      operationId: DeleteUser
+      security:
+        - bearerToken: [ ]
+      parameters:
+        - name: id
+          in: path
+          description: User id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: successful operation
+        '400':
+          description: Bad request response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFound'
 
 tags:
+  - name: Auth
+    description: Operations about auth
   - name: User
     description: Operations about user
 components:
   securitySchemes:
-    bearer:
+    bearerToken:
       type: http
       scheme: bearer
       bearerFormat: JWT
@@ -130,15 +322,7 @@ components:
       description: Not Found
   schemas:
     # Entities
-    Login:
-      type: object
-      properties:
-        uid:
-          type: string
-        password:
-          type: string
-
-    User:
+    PublicUser:
       type: object
       properties:
         id:
@@ -152,17 +336,71 @@ components:
           type: string
         user_name:
           type: string
-    ListUsers:
+      example:
+        id: 'bd7661b5-6ea6-49cc-abd8-49f110f4de27'
+        first_name: John
+        last_name: Doe
+        email: john@email.com
+        user_name: john
+
+    # Request Body Schemas
+    SignIn:
       type: object
       properties:
-        meta:
-          $ref: '#/components/schemas/Meta'
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/User'
+        uid:
+          type: string
+        password:
+          type: string
+      example:
+        uid: root
+        password: '123456'
+    SignUp:
+      type: object
+      properties:
+        first_name:
+          type: string
+        last_name:
+          type: string
+        email:
+          type: string
+        user_name:
+          type: string
+        password:
+          type: string
+        confirm_password:
+          type: string
+      required:
+        - first_name
+        - last_name
+        - email
+        - user_name
+        - password
+        - confirm_password
+      example:
+        first_name: John
+        last_name: Doe
+        email: john@email.com
+        user_name: john
+        password: john1234
+        confirm_password: john1234
+    EditUser:
+      type: object
+      properties:
+        first_name:
+          type: string
+        last_name:
+          type: string
+        email:
+          type: string
+        user_name:
+          type: string
+      example:
+        first_name: John
+        last_name: Doe
+        email: john_doe@email.com
+        user_name: john_doe
 
-
+    # Responses Schemas
     Meta:
       type: object
       properties:
@@ -193,8 +431,18 @@ components:
         sort: 'id'
         order: 'asc'
 
-    # Success responses
-    LoginSuccess:
+    ListUsers:
+      type: object
+      properties:
+        meta:
+          $ref: '#/components/schemas/Meta'
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/PublicUser'
+
+    # Success Responses
+    SignInSuccess:
       type: object
       properties:
         message:
@@ -205,7 +453,7 @@ components:
         display:
           type: boolean
         user:
-          $ref: '#/components/schemas/User'
+          $ref: '#/components/schemas/PublicUser'
         token:
           type: string
       example:
@@ -220,7 +468,7 @@ components:
           email: john@email.com
           user_name: john
 
-    # Errors responses
+    # Errors Responses
     NotFound:
       type: object
       properties:
@@ -307,7 +555,6 @@ components:
             param: ""
             message: "email must be a valid email"
         display: true
-
 
 
 
