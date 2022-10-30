@@ -10,6 +10,7 @@ type User struct {
 	gorm.Model
 
 	Id              string         `gorm:"primaryKey;default:uuid_generate_v4();" json:"id"`
+	Avatar          string         `gorm:"column:avatar;size:255;default:null;" json:"avatar" validate:"omitempty,url"`
 	FirstName       string         `gorm:"column:first_name;size:80;not null;" json:"first_name" validate:"required,min=2,max=80,alpha,omitempty"`
 	LastName        string         `gorm:"column:last_name;size:80;not null;" json:"last_name" validate:"required,min=2,max=80,alpha,omitempty"`
 	Email           string         `gorm:"column:email;size:255;not null;unique;unique;index;" json:"email" validate:"required,email,max=247,unique,omitempty"`
@@ -27,6 +28,7 @@ type Users []User
 
 type UserPublic struct {
 	Id        string `json:"id"`
+	Avatar    string `json:"avatar"`
 	FirstName string `json:"first_name"`
 	LastName  string `json:"last_name"`
 	Email     string `json:"email"`
@@ -37,6 +39,7 @@ type UserPublic struct {
 func (u *User) PublicUser() interface{} {
 	return &UserPublic{
 		Id:        u.Id,
+		Avatar:    u.Avatar,
 		FirstName: u.FirstName,
 		LastName:  u.LastName,
 		Email:     u.Email,
