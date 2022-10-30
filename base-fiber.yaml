@@ -54,7 +54,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UnprocessableEntity'
-
   /signup:
     post:
       tags:
@@ -300,11 +299,223 @@ paths:
               schema:
                 $ref: '#/components/schemas/NotFound'
 
+  /roles:
+    get:
+      tags:
+        - Role
+      summary: List roles
+      description: 'Get all roles from the system'
+      operationId: ListRoles
+      security:
+        - bearerToken: [ ]
+      parameters:
+        - name: page
+          in: query
+          description: Page number
+          required: false
+          schema:
+            type: integer
+            format: int32
+            minimum: 1
+            maximum: 100
+            default: 1
+        - name: per_page
+          in: query
+          description: Number of roles per page
+          required: false
+          schema:
+            type: integer
+            format: int32
+            default: 10
+            minimum: 1
+        - name: search
+          in: query
+          description: Search by public role attributes
+          required: false
+          schema:
+            type: string
+            default: 'name'
+        - name: sort
+          in: query
+          description: Sort by public role attributes
+          required: false
+          schema:
+            type: string
+            default: 'id'
+        - name: order
+          in: query
+          description: Order by public role attributes
+          required: false
+          schema:
+            type: string
+            default: 'asc'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListRoles'
+        '400':
+          description: Bad request response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+    post:
+      tags:
+        - Role
+      summary: Store role
+      description: 'Store role into the system'
+      operationId: StoreRole
+      security:
+        - bearerToken: [ ]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StoreRole'
+      responses:
+        '201':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PublicRole'
+        '400':
+          description: Bad request response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        '422':
+          description: Unprocessable Entity
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnprocessableEntity'
+  /roles/{id}:
+    get:
+      tags:
+        - Role
+      summary: Get role
+      description: 'Get role by id'
+      operationId: GetRole
+      security:
+        - bearerToken: [ ]
+      parameters:
+        - name: id
+          in: path
+          description: Role id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PublicRole'
+        '400':
+          description: Bad request response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        '404':
+          description: Role not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFound'
+    put:
+      tags:
+        - Role
+      summary: Edit role
+      description: 'Edit role by id'
+      operationId: EditRole
+      security:
+        - bearerToken: [ ]
+      parameters:
+        - name: id
+          in: path
+          description: Role id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EditRole'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PublicRole'
+        '400':
+          description: Bad request response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        '404':
+          description: Role not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFound'
+        '422':
+          description: Unprocessable Entity
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnprocessableEntity'
+    delete:
+      tags:
+        - Role
+      summary: Delete role
+      description: 'Delete role by id'
+      operationId: DeleteRole
+      security:
+        - bearerToken: [ ]
+      parameters:
+        - name: id
+          in: path
+          description: Role id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: successful operation
+        '400':
+          description: Bad request response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        '404':
+          description: Role not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFound'
 tags:
   - name: Auth
     description: Operations about auth
   - name: User
     description: Operations about user
+  - name: Role
+    description: Operations about role
 components:
   securitySchemes:
     bearerToken:
@@ -342,6 +553,20 @@ components:
         last_name: Doe
         email: john@email.com
         user_name: john
+    PublicRole:
+        type: object
+        properties:
+            id:
+              type: string
+              format: uuid
+            name:
+              type: string
+            description:
+              type: string
+        example:
+            id: 'bd7661b5-6ea6-49cc-abd8-49f110f4de27'
+            name: Admin
+            description: Admin role
 
     # Request Body Schemas
     SignIn:
@@ -400,6 +625,30 @@ components:
         email: john_doe@email.com
         user_name: john_doe
 
+    StoreRole:
+      type: object
+      properties:
+        slug:
+          type: string
+        description:
+          type: string
+      required:
+        - slug
+        - description
+      example:
+        slug: New Role
+        description: New Role Description
+    EditRole:
+      type: object
+      properties:
+        slug:
+          type: string
+        description:
+          type: string
+      example:
+        slug: Edit Role
+        description: Edit Role Description
+
     # Responses Schemas
     Meta:
       type: object
@@ -430,7 +679,6 @@ components:
         search: ''
         sort: 'id'
         order: 'asc'
-
     ListUsers:
       type: object
       properties:
@@ -440,6 +688,15 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/PublicUser'
+    ListRoles:
+      type: object
+      properties:
+        meta:
+          $ref: '#/components/schemas/Meta'
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/PublicRole'
 
     # Success Responses
     SignInSuccess:
