@@ -1,7 +1,7 @@
 _id: spc_902efd7885c64cd4af9b4bfa7311aabb
 type: ApiSpec
 parentId: wrk_5d8c9c3d005b473ab3df847c4db4c09a
-modified: 1667642938301
+modified: 1667666480904
 created: 1667029706091
 fileName: base-fiber-api
 contents: >+
@@ -94,6 +94,7 @@ contents: >+
               application/json:
                 schema:
                   $ref: '#/components/schemas/UnprocessableEntity'
+
 
     # authorization routes
     /users:
@@ -517,13 +518,43 @@ contents: >+
               application/json:
                 schema:
                   $ref: '#/components/schemas/NotFound'
+
+    /files:
+      post:
+        tags:
+          - File
+        summary: Store files
+        description: 'Store file into the system'
+        operationId: StoreFile
+        security:
+          - bearerToken: [ ]
+        requestBody:
+          content:
+            multipart/form-data:
+              schema:
+                type: object
+                properties:
+                  file:
+                    type: string
+                    format: binary
+        responses:
+          '200':
+            description: successful operation
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Files'
+
   tags:
     - name: Auth
       description: Operations about auth
     - name: User
       description: Operations about user
     - name: Role
-      description: Operations about role
+      description: Operations about role\
+    - name: File
+      description: Operations about file
+
   components:
     securitySchemes:
       bearerToken:
@@ -585,6 +616,32 @@ contents: >+
           id: 'f9480b4b-2559-4d82-8a98-703b8f97c9e3'
           name: Admin
           description: Admin role
+      File:
+        type: object
+        properties:
+          filename:
+            type: string
+          original_filename:
+            type: string
+          format:
+            type: string
+          type:
+            type: string
+          size:
+            type: integer
+          url:
+            type: string
+        example:
+          filename: 'file-1602510000.jpg'
+          original_filename: 'file.jpg'
+          format: 'jpeg'
+          type: 'image'
+          size: 123456
+          url: 'https://example.com/file-1602510000.jpg'
+      Files:
+        type: array
+        items:
+          $ref: '#/components/schemas/File'
 
       # Request Body Schemas
       SignIn:
