@@ -8,6 +8,7 @@ require (
 	github.com/go-playground/validator/v10 v10.11.0
 	github.com/gofiber/fiber/v2 v2.39.0
 	github.com/golang-jwt/jwt/v4 v4.4.2
+	github.com/h2non/bimg v1.1.9
 	github.com/imdario/mergo v0.3.13
 	github.com/joho/godotenv v1.4.0
 	golang.org/x/crypto v0.0.0-20220829220503-c86fa9a7ed90

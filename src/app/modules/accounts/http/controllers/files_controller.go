@@ -1,8 +1,9 @@
 package controllers
 
 import (
+	"base-fiber-api/src/app/shared/utils"
 	"github.com/gofiber/fiber/v2"
-	"github.com/gofiber/fiber/v2/utils"
+	uuid "github.com/gofiber/fiber/v2/utils"
 	"strings"
 )
 
@@ -24,6 +25,19 @@ func Store(c *fiber.Ctx) error {
 			"status":  fiber.StatusBadRequest,
 			"display": true,
 		})
+
+	}
+
+	// Create a folder if not exists
+	if !utils.IsExistFolder("public/uploads/") {
+		if err := utils.CreateFolder("public/uploads/"); err != nil {
+			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+				"message": "Error while creating folder",
+				"error":   err.Error(),
+				"status":  fiber.StatusInternalServerError,
+				"display": true,
+			})
+		}
 	}
 
 	files := form.File["files"]
@@ -31,27 +45,37 @@ func Store(c *fiber.Ctx) error {
 
 	for _, file := range files {
 		var link File
+		var filename string
 
-		//filename := strings.ToLower(regexp.MustCompile(`[^a-zA-Z0-9]+`).ReplaceAllString(strings.Split(file.Filename, ".")[0], "") + "_" + utils.UUIDv4())
-		filename := utils.UUIDv4()
-		originalFilename := strings.Split(file.Filename, ".")[0]
-		size := file.Size
-		fileType := strings.Split(file.Header["Content-Type"][0], "/")[0]
 		format := strings.Split(file.Header["Content-Type"][0], "/")[1]
-
-		if err := c.SaveFile(file, "public/uploads/"+filename+"."+format); err != nil {
-			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-				"message": "Error while getting form",
-				"error":   err.Error(),
-				"status":  fiber.StatusInternalServerError,
-				"display": true,
-			})
+		fileType := strings.Split(file.Header["Content-Type"][0], "/")[0]
+		if fileType == "image" {
+			name, err := utils.ImageCompression(file, 80)
+			if err != nil {
+				return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+					"message": "Error while opening file",
+					"error":   err.Error(),
+					"status":  fiber.StatusBadRequest,
+					"display": true,
+				})
+			}
+			filename = name
+		} else {
+			filename = uuid.UUIDv4()
+			if err := c.SaveFile(file, "public/uploads/"+filename+"."+format); err != nil {
+				return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+					"message": "Error while getting form",
+					"error":   err.Error(),
+					"status":  fiber.StatusInternalServerError,
+					"display": true,
+				})
+			}
 		}
 
 		link.FileName = filename
-		link.OriginalFileName = originalFilename
-		link.Size = size
-		link.Url = c.BaseURL() + "/files/uploads/" + filename + "." + format
+		link.OriginalFileName = strings.Split(file.Filename, ".")[0]
+		link.Size = file.Size
+		link.Url = c.BaseURL() + "/files/uploads/" + filename
 		link.FileFormat = format
 		link.FileType = fileType
 
