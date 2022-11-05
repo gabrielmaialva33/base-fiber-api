@@ -16,6 +16,7 @@ func Acl(allowedRoles []string) fiber.Handler {
 				"message": "Unauthorized",
 			})
 		}
+
 		token := strings.Split(bear, " ")[1]
 		id, err := utils.ParseJWT(token)
 		if err != nil {
