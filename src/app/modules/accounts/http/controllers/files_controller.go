@@ -2,16 +2,17 @@ package controllers
 
 import (
 	"github.com/gofiber/fiber/v2"
-	"github.com/gofrs/uuid"
+	"github.com/gofiber/fiber/v2/utils"
 	"strings"
 )
 
 type File struct {
-	FileName   string `json:"filename"`
-	FileFormat string `json:"format"`
-	FileType   string `json:"type"`
-	Size       int64  `json:"size"`
-	Url        string `json:"url"`
+	FileName         string `json:"filename"`
+	OriginalFileName string `json:"original_filename"`
+	FileFormat       string `json:"format"`
+	FileType         string `json:"type"`
+	Size             int64  `json:"size"`
+	Url              string `json:"url"`
 }
 
 func Store(c *fiber.Ctx) error {
@@ -31,7 +32,9 @@ func Store(c *fiber.Ctx) error {
 	for _, file := range files {
 		var link File
 
-		filename := strings.Split(strings.ReplaceAll(file.Filename, " ", "_"), ".")[0] + "_" + uuid.Must(uuid.NewV4()).String()
+		//filename := strings.ToLower(regexp.MustCompile(`[^a-zA-Z0-9]+`).ReplaceAllString(strings.Split(file.Filename, ".")[0], "") + "_" + utils.UUIDv4())
+		filename := utils.UUIDv4()
+		originalFilename := strings.Split(file.Filename, ".")[0]
 		size := file.Size
 		fileType := strings.Split(file.Header["Content-Type"][0], "/")[0]
 		format := strings.Split(file.Header["Content-Type"][0], "/")[1]
@@ -46,6 +49,7 @@ func Store(c *fiber.Ctx) error {
 		}
 
 		link.FileName = filename
+		link.OriginalFileName = originalFilename
 		link.Size = size
 		link.Url = c.BaseURL() + "/files/uploads/" + filename + "." + format
 		link.FileFormat = format
