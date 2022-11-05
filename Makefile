@@ -1,8 +1,8 @@
 server:
-	go run cmd/main.go
+	go run src/cmd/main.go
 
 build:
-	go build -o bin/server cmd/main.go
+	go build -o bin/server src/cmd/main.go
 
 d.up:
 	docker-compose up

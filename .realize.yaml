@@ -4,7 +4,7 @@ settings:
     interval: 0s
 schema:
   - name: base-fiber-api
-    path: ./cmd
+    path: ./src/cmd
     commands:
       install:
         status: true
@@ -15,7 +15,7 @@ schema:
       extensions:
         - go
       paths:
-        - /
+        - ../../
       ignored_paths:
         - .git
         - .realize

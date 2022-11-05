@@ -116,3 +116,28 @@ func (r *Repositories) Seed() {
 	r.db.Create(&roles)
 	r.db.Create(&users)
 }
+
+func (r *Repositories) Close() error {
+	sqlDB, err := r.db.DB()
+	if err != nil {
+		return err
+	}
+
+	return sqlDB.Close()
+}
+
+func (r *Repositories) Stats() map[string]interface{} {
+	sqlDB, _ := r.db.DB()
+	return map[string]interface{}{
+		"open_connections":     sqlDB.Stats().OpenConnections,
+		"max_open_connections": sqlDB.Stats().MaxOpenConnections,
+		"in_use":               sqlDB.Stats().InUse,
+		"idle":                 sqlDB.Stats().Idle,
+		"max_idle_closed":      sqlDB.Stats().MaxIdleClosed,
+		"max_idle_time_closed": sqlDB.Stats().MaxIdleTimeClosed,
+		"max_lifetime_closed":  sqlDB.Stats().MaxLifetimeClosed,
+		"wait_count":           sqlDB.Stats().WaitCount,
+		"wait_duration":        sqlDB.Stats().WaitDuration,
+		"ping":                 sqlDB.Ping(),
+	}
+}
