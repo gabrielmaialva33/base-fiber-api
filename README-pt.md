@@ -84,11 +84,11 @@ Os seguintes softwares devem estar instalados:
 ```sh
   $ cd base-fiber-api
   # Dependencies install.
-  $ go mod test 
+  $ go mod tidy
   # Config environment system
   $ cp .env.example .env
   # API start
-  $ go run main.go
+  $ go run cmd/main.go
 ```
 
 <br>
