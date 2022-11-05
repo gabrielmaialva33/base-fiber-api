@@ -28,7 +28,7 @@ func Store(c *fiber.Ctx) error {
 
 	}
 
-	// Create a folder if not exists
+	// Create a folder to upload if not exists
 	if !utils.IsExistFolder("public/uploads/") {
 		if err := utils.CreateFolder("public/uploads/"); err != nil {
 			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
