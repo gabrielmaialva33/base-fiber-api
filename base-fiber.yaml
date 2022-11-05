@@ -547,26 +547,36 @@ components:
           type: string
         user_name:
           type: string
+        roles:
+          type: array
+          items:
+            $ref: '#/components/schemas/PublicRole'
       example:
         id: 'bd7661b5-6ea6-49cc-abd8-49f110f4de27'
         first_name: John
         last_name: Doe
         email: john@email.com
         user_name: john
-    PublicRole:
-        type: object
-        properties:
-            id:
-              type: string
-              format: uuid
-            name:
-              type: string
-            description:
-              type: string
-        example:
-            id: 'bd7661b5-6ea6-49cc-abd8-49f110f4de27'
-            name: Admin
+        roles:
+          - id: 'b3d6dfdf-e849-4d12-b515-ac5769b4f28e'
+            name: admin
             description: Admin role
+            created_at: '2020-10-10 10:10:10'
+            updated_at: '2020-10-10 10:10:10'
+    PublicRole:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        description:
+          type: string
+      example:
+        id: 'f9480b4b-2559-4d82-8a98-703b8f97c9e3'
+        name: Admin
+        description: Admin role
 
     # Request Body Schemas
     SignIn:
@@ -624,7 +634,6 @@ components:
         last_name: Doe
         email: john_doe@email.com
         user_name: john_doe
-
     StoreRole:
       type: object
       properties:
@@ -724,6 +733,10 @@ components:
           last_name: Doe
           email: john@email.com
           user_name: john
+          roles:
+            - id: 'f9480b4b-2559-4d82-8a98-703b8f97c9e3'
+              name: admin
+              description: Admin role
 
     # Errors Responses
     NotFound:
