@@ -1,32 +1,14 @@
 version: '3.8'
 services:
-  app:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: api
-    restart: always
-    ports:
-      - '3333:3333'
-    depends_on:
-      - database
-    env_file:
-      - .env
-    environment:
-      HOST: ${HOST}
-      PORT: ${PORT}
-      DATABASE_URL: "postgres://postgres:postgres@database:5432/fiber_app"
-    networks:
-      - app-network
-  database:
+  postgres:
     image: postgres:latest
     container_name: database
     restart: always
     healthcheck:
       test: [ 'CMD', 'pg_isready', '-q', '-d', 'postgres', '-U', 'postgres' ]
-      timeout: 45s
       interval: 10s
-      retries: 10
+      timeout: 5s
+      retries: 5
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
@@ -36,6 +18,25 @@ services:
     volumes:
       - ./database:/var/lib/postgresql/data
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - app-network
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: api
+    restart: always
+    ports:
+      - '3333:3333'
+    depends_on:
+      postgres:
+        condition: service_healthy
+    env_file:
+      - .env
+    environment:
+      HOST: ${HOST}
+      PORT: ${PORT}
+      DATABASE_URL: "postgres://postgres:postgres@postgres:5432/fiber_app"
     networks:
       - app-network
 networks:

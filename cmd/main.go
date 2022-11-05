@@ -4,7 +4,6 @@ import (
 	"base-fiber-api/src/app/modules/accounts/http/controllers"
 	"base-fiber-api/src/app/modules/accounts/http/routes"
 	"base-fiber-api/src/database"
-	"fmt"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/logger"
@@ -16,7 +15,6 @@ func main() {
 	godotenv.Load()
 
 	dsn := os.Getenv("DATABASE_URL")
-	fmt.Fprintf(os.Stdout, "dsn: %s", dsn)
 	services := database.Connect(dsn)
 
 	services.Drop()
