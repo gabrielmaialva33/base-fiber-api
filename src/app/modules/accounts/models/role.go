@@ -42,3 +42,10 @@ func (roles Roles) PublicRoles() []interface{} {
 	}
 	return result
 }
+
+const (
+	RoleRoot  = "root"
+	RoleAdmin = "admin"
+	RoleUser  = "user"
+	RoleGuest = "guest"
+)

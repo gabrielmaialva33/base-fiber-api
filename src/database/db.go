@@ -17,7 +17,7 @@ type Repositories struct {
 
 var DB *gorm.DB
 
-func NewRepositories(dsn string) *Repositories {
+func Connect(dsn string) *Repositories {
 	database, err := gorm.Open(postgres.Open(dsn), &gorm.Config{
 		Logger: logger.Default.LogMode(logger.Info),
 	})
@@ -28,24 +28,56 @@ func NewRepositories(dsn string) *Repositories {
 	DB = database
 
 	return &Repositories{
-		User: repositories.UserRepository(database),
-		Role: repositories.RoleRepository(database),
+		User: repositories.NewUserRepository(database),
+		Role: repositories.NewRoleRepository(database),
 		db:   database,
 	}
 }
 
-func (r Repositories) Migrate() {
+func (r *Repositories) Migrate() {
 	r.db.Exec("CREATE EXTENSION IF NOT EXISTS \"uuid-ossp\";")
-	r.db.AutoMigrate(&models.User{}, &models.Role{}, &models.UserRole{})
-	r.db.SetupJoinTable(&models.User{}, "Roles", &models.UserRole{})
+	if err := r.db.AutoMigrate(&models.User{}, &models.Role{}, &models.UserRole{}); err != nil {
+		panic(" -> Could not migrate the database")
+	}
+
+	err := r.db.SetupJoinTable(&models.User{}, "Roles", &models.UserRole{})
+	if err != nil {
+		panic(" -> Could not setup join table")
+	}
 }
 
-func (r Repositories) Drop() {
+func (r *Repositories) Drop() {
 	r.db.Exec("DROP EXTENSION IF EXISTS \"uuid-ossp\" CASCADE;")
-	r.db.Migrator().DropTable(&models.User{}, &models.Role{}, &models.UserRole{})
+	err := r.db.Migrator().DropTable(&models.User{}, &models.Role{}, &models.UserRole{})
+	if err != nil {
+		panic(" -> Could not drop the database")
+	}
 }
 
-func (r Repositories) Seed() {
+func (r *Repositories) Seed() {
+	roles := []models.Role{
+		{
+			Name:        "root",
+			Slug:        "Root",
+			Description: "A root user has all permissions",
+		},
+		{
+			Name:        "admin",
+			Slug:        "Admin",
+			Description: "An admin user has all permissions except root",
+		},
+		{
+			Name:        "user",
+			Slug:        "User",
+			Description: "A user has limited permissions",
+		},
+		{
+			Name:        "guest",
+			Slug:        "Guest",
+			Description: "A guest user has no permissions",
+		},
+	}
+
 	users := []models.User{
 		{
 			FirstName: "Root",
@@ -53,11 +85,7 @@ func (r Repositories) Seed() {
 			Email:     "root@go.com",
 			UserName:  "root",
 			Password:  "123456",
-			Roles: []models.Role{{
-				Name:        "root",
-				Slug:        "Root",
-				Description: "A root user has all permissions",
-			}},
+			Role:      models.RoleRoot,
 		},
 		{
 			FirstName: "Admin",
@@ -65,11 +93,7 @@ func (r Repositories) Seed() {
 			Email:     "admin@go.com",
 			UserName:  "admin",
 			Password:  "123456",
-			Roles: []models.Role{{
-				Name:        "admin",
-				Slug:        "Admin",
-				Description: "An admin user has all permissions except root",
-			}},
+			Role:      models.RoleAdmin,
 		},
 		{
 			FirstName: "Gabriel",
@@ -77,11 +101,7 @@ func (r Repositories) Seed() {
 			Email:     "maia@go.com",
 			UserName:  "maia",
 			Password:  "123456",
-			Roles: []models.Role{{
-				Name:        "user",
-				Slug:        "User",
-				Description: "A user has limited permissions",
-			}},
+			Role:      models.RoleUser,
 		},
 		{
 			FirstName: "Guest",
@@ -89,13 +109,10 @@ func (r Repositories) Seed() {
 			Email:     "guest@go.com",
 			UserName:  "guest",
 			Password:  "123456",
-			Roles: []models.Role{{
-				Name:        "guest",
-				Slug:        "Guest",
-				Description: "A guest user has no permissions",
-			}},
+			Role:      models.RoleGuest,
 		},
 	}
 
+	r.db.Create(&roles)
 	r.db.Create(&users)
 }

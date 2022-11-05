@@ -6,7 +6,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-func RoleRoutes(app *fiber.App, controller *controllers.RoleServices) {
+func RoleRoutes(app *fiber.App, controller *controllers.RolesController) {
 	api := app.Group("/roles")
 
 	api.Use(middlewares.Auth)

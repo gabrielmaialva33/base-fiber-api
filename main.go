@@ -19,7 +19,7 @@ func main() {
 	}
 
 	dsn := os.Getenv("DATABASE_URL")
-	services := database.NewRepositories(dsn)
+	services := database.Connect(dsn)
 
 	services.Drop()
 	services.Migrate()
@@ -40,9 +40,11 @@ func main() {
 	}))
 	app.Use(logger.New())
 
-	userController := controllers.UsersController(services.User)
-	roleController := controllers.RolesController(services.Role)
+	// Controllers
+	userController := controllers.NewUsersController(services.User)
+	roleController := controllers.NewRolesController(services.Role)
 
+	// Routes
 	routes.UserRoutes(app, userController)
 	routes.RoleRoutes(app, roleController)
 

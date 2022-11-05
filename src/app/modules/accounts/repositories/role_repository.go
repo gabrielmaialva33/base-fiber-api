@@ -10,11 +10,19 @@ import (
 	"gorm.io/gorm/clause"
 )
 
-type RoleGorm struct {
+type RoleRepo struct {
 	db *gorm.DB
 }
 
-func (r RoleGorm) List(meta pkg.Meta) (*pkg.Pagination, error) {
+// NewRoleRepository returns a new instance of RoleRepo
+func NewRoleRepository(db *gorm.DB) *RoleRepo {
+	return &RoleRepo{db}
+}
+
+// RoleRepo implements interfaces.RoleInterface
+var _ interfaces.RoleInterface = &RoleRepo{}
+
+func (r *RoleRepo) List(meta pkg.Meta) (*pkg.Pagination, error) {
 	var roles models.Roles
 	var fields = []string{"name", "slug", "description"}
 	var pagination pkg.Pagination
@@ -29,7 +37,7 @@ func (r RoleGorm) List(meta pkg.Meta) (*pkg.Pagination, error) {
 	return &pagination, nil
 }
 
-func (r RoleGorm) Get(id string) (*models.Role, error) {
+func (r *RoleRepo) Get(id string) (*models.Role, error) {
 	var role models.Role
 	if err := r.db.Where("id = ?", id).First(&role).Error; err != nil {
 		return nil, err
@@ -37,21 +45,21 @@ func (r RoleGorm) Get(id string) (*models.Role, error) {
 	return &role, nil
 }
 
-func (r RoleGorm) Store(role *models.Role) (*models.Role, error) {
+func (r *RoleRepo) Store(role *models.Role) (*models.Role, error) {
 	if err := r.db.Create(&role).Error; err != nil {
 		return nil, err
 	}
 	return role, nil
 }
 
-func (r RoleGorm) Edit(role *models.Role) (*models.Role, error) {
+func (r *RoleRepo) Edit(role *models.Role) (*models.Role, error) {
 	if err := r.db.Clauses(clause.Returning{}).Where("id = ?", role.Id).Updates(&role).Error; err != nil {
 		return nil, err
 	}
 	return role, nil
 }
 
-func (r RoleGorm) Delete(role *models.Role) error {
+func (r *RoleRepo) Delete(role *models.Role) error {
 	r.db.Where("id = ?", role.Id).Updates(&role)
 	if err := r.db.Where("id = ?", role.Id).Delete(&role).Error; err != nil {
 		return err
@@ -59,7 +67,7 @@ func (r RoleGorm) Delete(role *models.Role) error {
 	return nil
 }
 
-func (r RoleGorm) FindBy(field string, value string) (*models.Role, error) {
+func (r *RoleRepo) FindBy(field string, value string) (*models.Role, error) {
 	var role models.Role
 	if err := r.db.Where(field+" = ?", value).First(&role).Error; err != nil {
 		return nil, err
@@ -67,7 +75,7 @@ func (r RoleGorm) FindBy(field string, value string) (*models.Role, error) {
 	return &role, nil
 }
 
-func (r RoleGorm) FindManyBy(field []string, value string) (*models.Role, error) {
+func (r *RoleRepo) FindManyBy(field []string, value string) (*models.Role, error) {
 	var role models.Role
 	for _, f := range field {
 		r.db.Where(f+" = ?", value).First(&role)
@@ -77,9 +85,3 @@ func (r RoleGorm) FindManyBy(field []string, value string) (*models.Role, error)
 	}
 	return nil, errors.New("user not found")
 }
-
-func RoleRepository(db *gorm.DB) *RoleGorm {
-	return &RoleGorm{db}
-}
-
-var _ interfaces.RoleInterface = &RoleGorm{}

@@ -10,11 +10,19 @@ import (
 	"gorm.io/gorm/clause"
 )
 
-type UserGorm struct {
+type UserRepo struct {
 	db *gorm.DB
 }
 
-func (u UserGorm) List(meta pkg.Meta) (*pkg.Pagination, error) {
+// NewUserRepository returns a new instance of UserRepo
+func NewUserRepository(db *gorm.DB) *UserRepo {
+	return &UserRepo{db}
+}
+
+// UserRepo implements interfaces.UserInterface
+var _ interfaces.UserInterface = &UserRepo{}
+
+func (u *UserRepo) List(meta pkg.Meta) (*pkg.Pagination, error) {
 	var users models.Users
 	var fields = []string{"first_name", "last_name", "email", "user_name"}
 	var pagination pkg.Pagination
@@ -29,7 +37,7 @@ func (u UserGorm) List(meta pkg.Meta) (*pkg.Pagination, error) {
 	return &pagination, nil
 }
 
-func (u UserGorm) Get(id string) (*models.User, error) {
+func (u *UserRepo) Get(id string) (*models.User, error) {
 	var user models.User
 	if err := u.db.Where("id = ?", id).First(&user).Error; err != nil {
 		return nil, err
@@ -37,21 +45,21 @@ func (u UserGorm) Get(id string) (*models.User, error) {
 	return &user, nil
 }
 
-func (u UserGorm) Store(user *models.User) (*models.User, error) {
+func (u *UserRepo) Store(user *models.User) (*models.User, error) {
 	if err := u.db.Create(&user).Error; err != nil {
 		return nil, err
 	}
 	return user, nil
 }
 
-func (u UserGorm) Edit(user *models.User) (*models.User, error) {
+func (u *UserRepo) Edit(user *models.User) (*models.User, error) {
 	if err := u.db.Clauses(clause.Returning{}).Where("id = ?", user.Id).Updates(&user).Error; err != nil {
 		return nil, err
 	}
 	return user, nil
 }
 
-func (u UserGorm) Delete(user *models.User) error {
+func (u *UserRepo) Delete(user *models.User) error {
 	u.db.Where("id = ?", user.Id).Updates(&user)
 	if err := u.db.Where("id = ?", user.Id).Delete(&user).Error; err != nil {
 		return err
@@ -59,7 +67,7 @@ func (u UserGorm) Delete(user *models.User) error {
 	return nil
 }
 
-func (u UserGorm) FindBy(field string, value string) (*models.User, error) {
+func (u *UserRepo) FindBy(field string, value string) (*models.User, error) {
 	var user models.User
 	if err := u.db.Where(field+" = ?", value).First(&user).Error; err != nil {
 		return nil, err
@@ -67,7 +75,7 @@ func (u UserGorm) FindBy(field string, value string) (*models.User, error) {
 	return &user, nil
 }
 
-func (u UserGorm) FindManyBy(field []string, value string) (*models.User, error) {
+func (u *UserRepo) FindManyBy(field []string, value string) (*models.User, error) {
 	var user models.User
 	for _, f := range field {
 		u.db.Where(f+" = ?", value).First(&user)
@@ -77,9 +85,3 @@ func (u UserGorm) FindManyBy(field []string, value string) (*models.User, error)
 	}
 	return nil, errors.New("record not found")
 }
-
-func UserRepository(db *gorm.DB) *UserGorm {
-	return &UserGorm{db}
-}
-
-var _ interfaces.UserInterface = &UserGorm{}

@@ -6,9 +6,9 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-func UserRoutes(app *fiber.App, controller *controllers.UserServices) {
-	app.Post("/signin", controller.SignIn).Name("sign_in")
-	app.Post("/signup", controller.SignUp).Name("sign_up")
+func UserRoutes(app *fiber.App, controller *controllers.UsersController) {
+	app.Post("/sign_in", controller.SignIn).Name("sign_in")
+	app.Post("/sign_up", controller.SignUp).Name("sign_up")
 
 	api := app.Group("/users")
 

@@ -10,7 +10,7 @@ info:
 servers:
   - url: http://127.0.0.1:3333
 paths:
-  /signin:
+  /sign_in:
     post:
       tags:
         - Auth
@@ -54,7 +54,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UnprocessableEntity'
-  /signup:
+  /sign_up:
     post:
       tags:
         - Auth

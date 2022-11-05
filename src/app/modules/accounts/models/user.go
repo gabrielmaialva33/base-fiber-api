@@ -18,6 +18,7 @@ type User struct {
 	UserName        string         `gorm:"column:user_name;size:58;not null;unique;index;" json:"user_name" validate:"required,min=4,max=50,unique,omitempty"`
 	Password        string         `gorm:"column:password;size:255;not null;" json:"password" form:"password" validate:"required,min=6,max=50,omitempty"`
 	ConfirmPassword string         `gorm:"-" json:"confirm_password" form:"confirm_password" validate:"required,min=6,max=50,eqfield=Password,omitempty"`
+	Role            string         `gorm:"-" json:"-"`
 	CreatedAt       time.Time      `gorm:"column:created_at;not null;default:CURRENT_TIMESTAMP;" json:"-"`
 	UpdatedAt       time.Time      `gorm:"column:updated_at;not null;default:CURRENT_TIMESTAMP;" json:"-"`
 	DeletedAt       gorm.DeletedAt `gorm:"column:deleted_at;index,default:null;" json:"-"`
@@ -63,12 +64,34 @@ func (users Users) PublicUsers() []interface{} {
 }
 
 // BeforeSave hook executed before saving a User to the database.
-func (u *User) BeforeSave(*gorm.DB) error {
+func (u *User) BeforeSave(db *gorm.DB) error {
 	hash, err := pkg.CreateHash(u.Password, pkg.DefaultParams)
 	if err != nil {
 		return err
 	}
 	u.Password = hash
+
+	return nil
+}
+
+func (u *User) AfterCreate(db *gorm.DB) error {
+	var role Role
+	if u.Role == "" {
+		db.Where("name = ?", RoleGuest).First(&role)
+	} else if u.Role == RoleAdmin {
+		db.Where("name = ?", RoleAdmin).First(&role)
+	} else if u.Role == RoleUser {
+		db.Where("name = ?", RoleUser).First(&role)
+	} else if u.Role == RoleRoot {
+		db.Where("name = ?", RoleGuest).First(&role)
+	} else {
+		db.Where("name = ?", RoleGuest).First(&role)
+	}
+
+	err := db.Model(&u).Association("Roles").Append(&role)
+	if err != nil {
+		return err
+	}
 	return nil
 }
 

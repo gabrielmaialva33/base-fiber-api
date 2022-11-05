@@ -3,6 +3,7 @@ package controllers
 import (
 	"base-fiber-api/src/app/modules/accounts/interfaces"
 	"base-fiber-api/src/app/modules/accounts/models"
+	"base-fiber-api/src/app/modules/accounts/services"
 	"base-fiber-api/src/app/shared/pkg"
 	"base-fiber-api/src/app/shared/validators"
 	"github.com/gofiber/fiber/v2"
@@ -11,15 +12,17 @@ import (
 	"strings"
 )
 
-type RoleServices struct {
-	rr interfaces.RoleInterface
+// RolesController is a controller for roles
+type RolesController struct {
+	rr services.RoleServicesInterface
 }
 
-func RolesController(rr interfaces.RoleInterface) *RoleServices {
-	return &RoleServices{rr}
+// NewRolesController is a constructor for RolesController
+func NewRolesController(rr interfaces.RoleInterface) *RolesController {
+	return &RolesController{rr}
 }
 
-func (r RoleServices) List(c *fiber.Ctx) error {
+func (r *RolesController) List(c *fiber.Ctx) error {
 	page, _ := strconv.Atoi(c.Query("page", "1"))
 	perPage, _ := strconv.Atoi(c.Query("per_page", "10"))
 	search := c.Query("search", "")
@@ -45,7 +48,7 @@ func (r RoleServices) List(c *fiber.Ctx) error {
 	return c.JSON(roles)
 }
 
-func (r RoleServices) Get(c *fiber.Ctx) error {
+func (r *RolesController) Get(c *fiber.Ctx) error {
 	uuid := c.Params("roleId")
 
 	if validators.ValidateUUID(uuid) == false {
@@ -69,7 +72,7 @@ func (r RoleServices) Get(c *fiber.Ctx) error {
 	return c.JSON(role.PublicRole())
 }
 
-func (r RoleServices) Store(c *fiber.Ctx) error {
+func (r *RolesController) Store(c *fiber.Ctx) error {
 	data := models.Role{}
 	if err := c.BodyParser(&data); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
@@ -114,7 +117,7 @@ func (r RoleServices) Store(c *fiber.Ctx) error {
 	return c.JSON(newRole.PublicRole())
 }
 
-func (r RoleServices) Edit(c *fiber.Ctx) error {
+func (r *RolesController) Edit(c *fiber.Ctx) error {
 	uuid := c.Params("roleId")
 	if validators.ValidateUUID(uuid) == false {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
@@ -179,7 +182,7 @@ func (r RoleServices) Edit(c *fiber.Ctx) error {
 	return c.JSON(editedRole.PublicRole())
 }
 
-func (r RoleServices) Delete(c *fiber.Ctx) error {
+func (r *RolesController) Delete(c *fiber.Ctx) error {
 	uuid := c.Params("roleId")
 	if validators.ValidateUUID(uuid) == false {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{

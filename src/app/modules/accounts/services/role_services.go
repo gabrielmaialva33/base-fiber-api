@@ -6,36 +6,40 @@ import (
 	"base-fiber-api/src/app/shared/pkg"
 )
 
-type RoleRepository struct {
+type RoleServices struct {
 	rr interfaces.RoleInterface
 }
 
-func (r RoleRepository) List(meta pkg.Meta) (*pkg.Pagination, error) {
+type RoleServicesInterface interface {
+	interfaces.RoleInterface
+}
+
+var _ RoleServicesInterface = &RoleServices{}
+
+func (r *RoleServices) List(meta pkg.Meta) (*pkg.Pagination, error) {
 	return r.rr.List(meta)
 }
 
-func (r RoleRepository) Get(id string) (*models.Role, error) {
+func (r *RoleServices) Get(id string) (*models.Role, error) {
 	return r.rr.Get(id)
 }
 
-func (r RoleRepository) Store(role *models.Role) (*models.Role, error) {
+func (r *RoleServices) Store(role *models.Role) (*models.Role, error) {
 	return r.rr.Store(role)
 }
 
-func (r RoleRepository) Edit(role *models.Role) (*models.Role, error) {
+func (r *RoleServices) Edit(role *models.Role) (*models.Role, error) {
 	return r.rr.Edit(role)
 }
 
-func (r RoleRepository) Delete(role *models.Role) error {
+func (r *RoleServices) Delete(role *models.Role) error {
 	return r.rr.Delete(role)
 }
 
-func (r RoleRepository) FindBy(field string, value string) (*models.Role, error) {
+func (r *RoleServices) FindBy(field string, value string) (*models.Role, error) {
 	return r.rr.FindBy(field, value)
 }
 
-func (r RoleRepository) FindManyBy(field []string, value string) (*models.Role, error) {
+func (r *RoleServices) FindManyBy(field []string, value string) (*models.Role, error) {
 	return r.rr.FindManyBy(field, value)
 }
-
-var _ interfaces.RoleInterface = &RoleRepository{}

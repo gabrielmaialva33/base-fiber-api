@@ -3,6 +3,7 @@ package controllers
 import (
 	"base-fiber-api/src/app/modules/accounts/interfaces"
 	"base-fiber-api/src/app/modules/accounts/models"
+	"base-fiber-api/src/app/modules/accounts/services"
 	"base-fiber-api/src/app/shared/pkg"
 	"base-fiber-api/src/app/shared/utils"
 	"base-fiber-api/src/app/shared/validators"
@@ -12,15 +13,17 @@ import (
 	"strings"
 )
 
-type UserServices struct {
-	ur interfaces.UserInterface
+// UsersController is the controller for users
+type UsersController struct {
+	ur services.UserServicesInterface
 }
 
-func UsersController(ur interfaces.UserInterface) *UserServices {
-	return &UserServices{ur}
+// NewUsersController creates a new instance of the user controller
+func NewUsersController(ur interfaces.UserInterface) *UsersController {
+	return &UsersController{ur}
 }
 
-func (s *UserServices) List(c *fiber.Ctx) error {
+func (s *UsersController) List(c *fiber.Ctx) error {
 	page, _ := strconv.Atoi(c.Query("page", "1"))
 	perPage, _ := strconv.Atoi(c.Query("per_page", "10"))
 	search := c.Query("search", "")
@@ -46,7 +49,7 @@ func (s *UserServices) List(c *fiber.Ctx) error {
 	return c.JSON(users)
 }
 
-func (s *UserServices) Get(c *fiber.Ctx) error {
+func (s *UsersController) Get(c *fiber.Ctx) error {
 	uuid := c.Params("userId")
 
 	if validators.ValidateUUID(uuid) == false {
@@ -66,7 +69,7 @@ func (s *UserServices) Get(c *fiber.Ctx) error {
 	return c.JSON(user.PublicUser())
 }
 
-func (s *UserServices) Store(c *fiber.Ctx) error {
+func (s *UsersController) Store(c *fiber.Ctx) error {
 	data := models.User{}
 	if err := c.BodyParser(&data); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
@@ -75,7 +78,9 @@ func (s *UserServices) Store(c *fiber.Ctx) error {
 		})
 	}
 
-	user := models.User{}
+	user := models.User{
+		Role: models.RoleUser,
+	}
 	if err := mergo.Merge(&user, data); err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"message": "Error while merging data",
@@ -101,7 +106,7 @@ func (s *UserServices) Store(c *fiber.Ctx) error {
 	return c.JSON(newUser.PublicUser())
 }
 
-func (s *UserServices) Edit(c *fiber.Ctx) error {
+func (s *UsersController) Edit(c *fiber.Ctx) error {
 	uuid := c.Params("userId")
 	if validators.ValidateUUID(uuid) == false {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
@@ -153,7 +158,7 @@ func (s *UserServices) Edit(c *fiber.Ctx) error {
 	return c.JSON(editedUser.PublicUser())
 }
 
-func (s *UserServices) Delete(c *fiber.Ctx) error {
+func (s *UsersController) Delete(c *fiber.Ctx) error {
 	uuid := c.Params("userId")
 	if validators.ValidateUUID(uuid) == false {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
@@ -187,7 +192,7 @@ func (s *UserServices) Delete(c *fiber.Ctx) error {
 	})
 }
 
-func (s *UserServices) SignIn(c *fiber.Ctx) error {
+func (s *UsersController) SignIn(c *fiber.Ctx) error {
 	data := models.Login{}
 	if err := c.BodyParser(&data); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
@@ -244,7 +249,7 @@ func (s *UserServices) SignIn(c *fiber.Ctx) error {
 	})
 }
 
-func (s *UserServices) SignUp(c *fiber.Ctx) error {
+func (s *UsersController) SignUp(c *fiber.Ctx) error {
 	data := models.User{}
 	if err := c.BodyParser(&data); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
