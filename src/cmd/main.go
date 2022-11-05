@@ -8,15 +8,11 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/joho/godotenv"
-	"log"
 	"os"
 )
 
 func main() {
-
-	if err := godotenv.Load(); err != nil {
-		log.Fatal("Error loading .env file")
-	}
+	godotenv.Load()
 
 	dsn := os.Getenv("DATABASE_URL")
 	services := database.Connect(dsn)
@@ -30,6 +26,7 @@ func main() {
 		EnableTrustedProxyCheck: true,
 		TrustedProxies:          []string{"0.0.0.0"},
 		ProxyHeader:             fiber.HeaderXForwardedFor,
+		BodyLimit:               10 * 1024 * 1024, // 10 MB
 	})
 
 	app.Use(cors.New(cors.Config{
@@ -40,6 +37,14 @@ func main() {
 	}))
 	app.Use(logger.New())
 
+	app.Get("/", func(c *fiber.Ctx) error {
+		return c.JSON(fiber.Map{
+			"message":  "Welcome to the Base Fiber API",
+			"status":   c.Response().StatusCode(),
+			"database": services.Stats(),
+		})
+	})
+
 	// Controllers
 	userController := controllers.NewUsersController(services.User)
 	roleController := controllers.NewRolesController(services.Role)
@@ -47,6 +52,7 @@ func main() {
 	// Routes
 	routes.UserRoutes(app, userController)
 	routes.RoleRoutes(app, roleController)
+	routes.FileRoutes(app)
 
 	_ = app.Listen(os.Getenv("HOST") + ":" + os.Getenv("PORT"))
 }
