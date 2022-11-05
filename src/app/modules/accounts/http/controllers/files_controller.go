@@ -17,17 +17,6 @@ type File struct {
 }
 
 func Store(c *fiber.Ctx) error {
-	form, err := c.MultipartForm()
-	if err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"message": "Error while getting form",
-			"error":   err.Error(),
-			"status":  fiber.StatusBadRequest,
-			"display": true,
-		})
-
-	}
-
 	// Create a folder to upload if not exists
 	if !utils.IsExistFolder("public/uploads/") {
 		if err := utils.CreateFolder("public/uploads/"); err != nil {
@@ -40,7 +29,18 @@ func Store(c *fiber.Ctx) error {
 		}
 	}
 
-	files := form.File["files"]
+	form, err := c.MultipartForm()
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"message": "Error while getting form",
+			"error":   err.Error(),
+			"status":  fiber.StatusBadRequest,
+			"display": true,
+		})
+
+	}
+
+	files := form.File["file"]
 	var links []*File
 
 	for _, file := range files {

@@ -26,7 +26,7 @@ func main() {
 		EnableTrustedProxyCheck: true,
 		TrustedProxies:          []string{"0.0.0.0"},
 		ProxyHeader:             fiber.HeaderXForwardedFor,
-		BodyLimit:               5 * 1024 * 1024,
+		BodyLimit:               10 * 1024 * 1024, // 10 MB
 	})
 
 	app.Use(cors.New(cors.Config{
