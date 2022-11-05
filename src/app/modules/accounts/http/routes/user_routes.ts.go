@@ -12,7 +12,7 @@ func UserRoutes(app *fiber.App, controller *controllers.UsersController) {
 
 	api := app.Group("/users")
 
-	api.Use(middlewares.Auth)
+	api.Use(middlewares.Acl([]string{"admin", "root", "user"}))
 
 	api.Get("/", controller.List).Name("users.list")
 	api.Get("/:userId", controller.Get).Name("users.get")

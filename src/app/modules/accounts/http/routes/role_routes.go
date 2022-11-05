@@ -9,7 +9,7 @@ import (
 func RoleRoutes(app *fiber.App, controller *controllers.RolesController) {
 	api := app.Group("/roles")
 
-	api.Use(middlewares.Auth)
+	api.Use(middlewares.Acl([]string{"admin", "root"}))
 
 	api.Get("/", controller.List).Name("roles.list")
 	api.Get("/:roleId", controller.Get).Name("roles.get")

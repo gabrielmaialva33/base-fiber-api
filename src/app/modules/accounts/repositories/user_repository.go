@@ -39,7 +39,7 @@ func (u *UserRepo) List(meta pkg.Meta) (*pkg.Pagination, error) {
 
 func (u *UserRepo) Get(id string) (*models.User, error) {
 	var user models.User
-	if err := u.db.Where("id = ?", id).First(&user).Error; err != nil {
+	if err := u.db.Preload("Roles").Where("id = ?", id).First(&user).Error; err != nil {
 		return nil, err
 	}
 	return &user, nil
@@ -53,7 +53,7 @@ func (u *UserRepo) Store(user *models.User) (*models.User, error) {
 }
 
 func (u *UserRepo) Edit(user *models.User) (*models.User, error) {
-	if err := u.db.Clauses(clause.Returning{}).Where("id = ?", user.Id).Updates(&user).Error; err != nil {
+	if err := u.db.Clauses(clause.Returning{}).Preload("Roles").Where("id = ?", user.Id).Updates(&user).Error; err != nil {
 		return nil, err
 	}
 	return user, nil
@@ -69,7 +69,7 @@ func (u *UserRepo) Delete(user *models.User) error {
 
 func (u *UserRepo) FindBy(field string, value string) (*models.User, error) {
 	var user models.User
-	if err := u.db.Where(field+" = ?", value).First(&user).Error; err != nil {
+	if err := u.db.Preload("Roles").Where(field+" = ?", value).First(&user).Error; err != nil {
 		return nil, err
 	}
 	return &user, nil
@@ -78,7 +78,7 @@ func (u *UserRepo) FindBy(field string, value string) (*models.User, error) {
 func (u *UserRepo) FindManyBy(field []string, value string) (*models.User, error) {
 	var user models.User
 	for _, f := range field {
-		u.db.Where(f+" = ?", value).First(&user)
+		u.db.Preload("Roles").Where(f+" = ?", value).First(&user)
 		if user.Id != "" {
 			return &user, nil
 		}

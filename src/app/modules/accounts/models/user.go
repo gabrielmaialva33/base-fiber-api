@@ -64,7 +64,7 @@ func (users Users) PublicUsers() []interface{} {
 }
 
 // BeforeSave hook executed before saving a User to the database.
-func (u *User) BeforeSave(db *gorm.DB) error {
+func (u *User) BeforeSave(*gorm.DB) error {
 	hash, err := pkg.CreateHash(u.Password, pkg.DefaultParams)
 	if err != nil {
 		return err
@@ -83,7 +83,7 @@ func (u *User) AfterCreate(db *gorm.DB) error {
 	} else if u.Role == RoleUser {
 		db.Where("name = ?", RoleUser).First(&role)
 	} else if u.Role == RoleRoot {
-		db.Where("name = ?", RoleGuest).First(&role)
+		db.Where("name = ?", RoleRoot).First(&role)
 	} else {
 		db.Where("name = ?", RoleGuest).First(&role)
 	}
