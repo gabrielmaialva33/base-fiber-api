@@ -2,3 +2,4 @@
 golib
 .env
 database
+public/uploads/*

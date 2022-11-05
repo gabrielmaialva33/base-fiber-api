@@ -51,6 +51,7 @@ func main() {
 	// Routes
 	routes.UserRoutes(app, userController)
 	routes.RoleRoutes(app, roleController)
+	routes.FileRoutes(app)
 
 	_ = app.Listen(os.Getenv("HOST") + ":" + os.Getenv("PORT"))
 }

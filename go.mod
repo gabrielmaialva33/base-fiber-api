@@ -3,11 +3,11 @@ module base-fiber-api
 go 1.19
 
 require (
-	github.com/fatih/structs v1.1.0
 	github.com/go-playground/locales v0.14.0
 	github.com/go-playground/universal-translator v0.18.0
 	github.com/go-playground/validator/v10 v10.11.0
 	github.com/gofiber/fiber/v2 v2.38.1
+	github.com/gofrs/uuid v4.0.0+incompatible
 	github.com/golang-jwt/jwt/v4 v4.4.2
 	github.com/imdario/mergo v0.3.13
 	github.com/joho/godotenv v1.4.0
