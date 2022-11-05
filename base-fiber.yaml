@@ -532,6 +532,11 @@ paths:
       responses:
         '200':
           description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Files'
+
 tags:
   - name: Auth
     description: Operations about auth
@@ -622,6 +627,10 @@ components:
         type: 'image'
         size: 123456
         url: 'https://example.com/file-1602510000.jpg'
+    Files:
+      type: array
+      items:
+        $ref: '#/components/schemas/File'
 
     # Request Body Schemas
     SignIn:
