@@ -515,7 +515,7 @@ paths:
     post:
       tags:
         - File
-      summary: Store file
+      summary: Store files
       description: 'Store file into the system'
       operationId: StoreFile
       security:
@@ -543,7 +543,10 @@ tags:
   - name: User
     description: Operations about user
   - name: Role
-    description: Operations about role
+    description: Operations about role\
+  - name: File
+    description: Operations about file
+
 components:
   securitySchemes:
     bearerToken:
